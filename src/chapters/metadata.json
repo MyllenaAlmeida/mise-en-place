@@ -74,6 +74,12 @@
       "title": "Chapter 12: Pensamentos",
       "file": "12-chapter-12.html",
       "order": 12
+    },
+    {
+      "id": "chapter-13",
+      "title": "Chapter 13: Tulipas Brancas",
+      "file": "13-chapter-13.html",
+      "order": 13
     }
   ]
 }

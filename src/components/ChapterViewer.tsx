@@ -96,6 +96,12 @@ export default function ChapterViewer({
         });
         doc.querySelectorAll('.endnote-link').forEach((endnoteLink) => endnoteLink.remove());
 
+        doc.querySelectorAll<HTMLParagraphElement>('p').forEach((paragraph) => {
+          if (paragraph.textContent?.trim() === '◆ ◆ ◆') {
+            paragraph.classList.add('chapter-divider');
+          }
+        });
+
         doc.querySelectorAll<HTMLElement>('[id^="endnotes"]').forEach((notesSection) => {
           const heading = notesSection.querySelector('p');
           if (heading?.textContent?.trim().toLowerCase() === 'chapter end notes') {
@@ -129,6 +135,14 @@ export default function ChapterViewer({
               padding: 60px 40px !important;
             }
           }
+
+          @media (max-width: 639px) {
+            body {
+              font-size: ${Math.max(settings.fontSize, 18)}px !important;
+              padding: 28px 18px !important;
+              line-height: 1.85 !important;
+            }
+          }
           
           h1, h2, h3 {
             font-family: 'Playfair Display', Georgia, serif !important;
@@ -152,6 +166,13 @@ export default function ChapterViewer({
           p:first-of-type {
             text-indent: 0 !important;
           }
+
+          p.chapter-divider {
+            text-align: center !important;
+            text-indent: 0 !important;
+            letter-spacing: 0.35em !important;
+            margin: 2.5em 0 !important;
+          }
           
           .chapter-title {
             text-align: center !important;
@@ -162,6 +183,22 @@ export default function ChapterViewer({
             font-family: 'Playfair Display', Georgia, serif !important;
             color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
             font-weight: 600 !important;
+          }
+
+          @media (max-width: 639px) {
+            .chapter-title {
+              font-size: 1.65em !important;
+              line-height: 1.2 !important;
+              margin: 0 0 1.35em !important;
+              padding-bottom: 0.8em !important;
+              border-bottom-width: 2px !important;
+              overflow-wrap: anywhere !important;
+            }
+
+            p {
+              font-weight: 600 !important;
+              line-height: 1.85 !important;
+            }
           }
           
           .calibre7, .userstuff1, .userstuff2, .calibre1 {

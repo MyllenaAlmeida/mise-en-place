@@ -23,7 +23,7 @@ const THEMES = {
 };
 
 export function useTheme() {
-  const [theme, setTheme] = useState<ReaderSettings['theme']>('light');
+  const [theme, setTheme] = useState<ReaderSettings['theme']>('sepia');
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') as ReaderSettings['theme'];
@@ -31,7 +31,7 @@ export function useTheme() {
       setTheme(saved);
       document.documentElement.dataset.theme = saved;
     } else {
-      document.documentElement.dataset.theme = 'light';
+      document.documentElement.dataset.theme = 'sepia';
     }
   }, []);
 

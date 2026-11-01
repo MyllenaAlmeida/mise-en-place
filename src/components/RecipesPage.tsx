@@ -83,7 +83,7 @@ export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters,
   const filters: Array<'Todas' | RecipeCategory> = ['Todas', 'Entrada', 'Principal', 'Sobremesa'];
 
   return (
-    <div className={`min-h-screen ${page}`}>
+    <div className={`min-h-dvh ${page}`}>
       <SiteHeader title={bookInfo?.title || 'Mise en Place'} theme={theme} activePage="recipes" brandLabel="Voltar à página inicial" onBrandClick={onGoHome} onBackHome={onGoHome} backHomeLabel="Voltar à home" onGoToChapters={onGoToChapters} onOpenCharacters={onOpenCharacters} onOpenKitchen={onOpenKitchen} onOpenRecipes={onOpenRecipes} onOpenSettings={onOpenSettings} />
       <main className="mx-auto max-w-7xl px-4 pb-12 pt-5 sm:px-8 sm:pb-16 sm:pt-8">
         <section className="story-hero relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-burgundy-800 via-burgundy-700 to-[#68231f] p-6 text-ivory-50 shadow-elegant sm:p-9" aria-labelledby="recipes-title">
@@ -91,7 +91,7 @@ export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters,
           <div className="relative max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full border border-ivory-50/25 bg-ivory-50/10 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-ivory-100"><CookingPot className="h-3.5 w-3.5" /> Caderno do Racine</span>
             <h1 id="recipes-title" className="mt-5 font-display text-3xl font-semibold leading-tight sm:text-4xl">Receitas da história</h1>
-            <p className="mt-3 max-w-2xl font-serif text-base leading-relaxed text-ivory-100/90 sm:text-lg">Pratos que aparecem nos capítulos, adaptados para você preparar em casa. As quantidades e etapas são sugestões da página: a narrativa cita os pratos, mas não traz as fichas técnicas completas.</p>
+            <p className="mt-3 max-w-2xl font-serif text-base leading-relaxed text-ivory-100/90 sm:text-lg">Pratos que aparecem na história para você fazer.</p>
           </div>
           <div className="relative mt-6 flex flex-wrap gap-2 text-xs font-semibold text-ivory-100/90">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-ivory-50/10 px-3 py-1.5"><ChefHat className="h-3.5 w-3.5" /> Cozinha vegetal</span>

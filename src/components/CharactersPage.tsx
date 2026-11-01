@@ -10,6 +10,8 @@ type Character = {
   nickname?: string;
   role: string;
   initials: string;
+  image?: string;
+  imagePosition?: string;
   groups: Array<'racine' | 'circle' | 'lorena'>;
   summary: string;
   detail: string;
@@ -20,6 +22,7 @@ const characters: Character[] = [
     name: 'Lorena Esteves',
     role: 'Chef e sócia do Racine',
     initials: 'LO',
+    image: '/lorena-face.png',
     groups: ['racine', 'lorena'],
     summary: 'Precisa, exigente e apaixonada pela cozinha que construiu.',
     detail: 'O Racine é seu projeto de vida e seu lugar de controle. A chegada de Eduarda começa a mexer com a rotina impecável — e com as defesas que Lorena ergueu para si.',
@@ -29,6 +32,8 @@ const characters: Character[] = [
     nickname: 'Eduarda · Juquinha',
     role: 'Estagiária de gastronomia',
     initials: 'ED',
+    image: '/eduarda-face.png',
+    imagePosition: '70% 30%',
     groups: ['racine', 'circle', 'lorena'],
     summary: 'Uma nova carreira, um caderno de receitas e um recomeço no horizonte.',
     detail: 'Afastada da polícia e estudante de gastronomia, Eduarda aposta na seleção do Racine para mudar de vida. Seu jeito intuitivo de cozinhar carrega os ensinamentos da mãe, Violeta.',
@@ -37,6 +42,8 @@ const characters: Character[] = [
     name: 'Maggye Damatta',
     role: 'Sócia e melhor amiga de Lorena',
     initials: 'MA',
+    image: '/maggye.png',
+    imagePosition: '50% 35%',
     groups: ['racine', 'circle', 'lorena'],
     summary: 'Prática, afetuosa e especialista em perceber quando a amiga precisa de ajuda.',
     detail: 'Maggye ajuda a manter o restaurante em movimento e incentiva Lorena a dividir responsabilidades. Também conhece a chef o bastante para notar quando o assunto é mais pessoal do que profissional.',
@@ -46,6 +53,8 @@ const characters: Character[] = [
     nickname: 'Lucy',
     role: 'Estagiária do Racine',
     initials: 'LU',
+    image: '/lucelia.png',
+    imagePosition: '50% 30%',
     groups: ['racine', 'lorena'],
     summary: 'Competitiva e tecnicamente preparada, gosta de mostrar do que é capaz.',
     detail: 'Colega de Eduarda na seleção e prima distante de Maggye, Lucélia chega ao Racine confiante em sua formação. A exigência de Lorena vai colocá-la diante de novos desafios.',
@@ -54,6 +63,8 @@ const characters: Character[] = [
     name: 'Celina Martins',
     role: 'Chef confeiteira do Racine',
     initials: 'CE',
+    image: '/celina.png',
+    imagePosition: '50% 42%',
     groups: ['racine', 'lorena'],
     summary: 'Talentosa na confeitaria, expansiva e sem medo de flertar.',
     detail: 'Celina é uma presença leve e carismática na cozinha. Seu talento para sobremesas anda junto com um interesse por Lorena que a chef tenta manter fora do expediente.',
@@ -63,14 +74,28 @@ const characters: Character[] = [
     nickname: 'Paulinho',
     role: 'Melhor amigo e companheiro de casa de Eduarda',
     initials: 'PA',
+    image: '/paulo.png',
+    imagePosition: '50% 30%',
     groups: ['circle'],
     summary: 'Protetor, brincalhão e sempre pronto para apoiar a amiga.',
     detail: 'Paulinho é a família que Eduarda escolheu. Entre piadas e conversas francas, ele oferece apoio emocional e prático enquanto ela tenta reorganizar a vida.',
   },
   {
+    name: 'Gerluce',
+    role: 'Melhor amiga de Eduarda',
+    initials: 'GE',
+    image: '/gerluce.png',
+    imagePosition: '50% 28%',
+    groups: ['circle'],
+    summary: 'Espontânea, carinhosa e sempre pronta para animar a amiga.',
+    detail: 'Namorada de Paulo e uma das melhores amigas de Eduarda, Gerluce divide com eles a rotina e os momentos importantes. Afetuosa e bem-humorada, ajuda a organizar surpresas e não hesita em apoiar a amiga quando ela precisa.',
+  },
+  {
     name: 'Violeta Fragoso',
     role: 'Mãe de Eduarda',
     initials: 'VI',
+    image: '/violeta.png',
+    imagePosition: '50% 28%',
     groups: ['circle'],
     summary: 'Sua presença continua viva nas lembranças e nas receitas da filha.',
     detail: 'Mesmo ausente, Violeta acompanha o caminho de Eduarda por meio do caderno de receitas e dos gestos de cuidado que ensinou à filha na cozinha.',
@@ -79,6 +104,8 @@ const characters: Character[] = [
     name: 'Henrique Fragoso',
     role: 'Pai de Eduarda',
     initials: 'HE',
+    image: '/henrique.png',
+    imagePosition: '50% 35%',
     groups: ['circle'],
     summary: 'Um pai amoroso que quer estar por perto quando a filha precisar.',
     detail: 'Henrique é médico e mantém com Eduarda um vínculo afetuoso, ainda que os dois estejam reaprendendo a conversar e a compartilhar as dificuldades.',
@@ -127,7 +154,7 @@ export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToCha
   ];
 
   return (
-    <div className={`min-h-screen ${pageSurface}`}>
+    <div className={`min-h-dvh ${pageSurface}`}>
       <SiteHeader
         title={bookInfo?.title || 'Mise en Place'}
         theme={settings.theme}
@@ -177,10 +204,15 @@ export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToCha
                 <article key={character.name} className={`overflow-hidden rounded-2xl border shadow-soft transition-all duration-200 ${characterCardSurface} ${isExpanded ? 'border-gold-400 shadow-elegant' : 'hover:-translate-y-0.5 hover:border-burgundy-200 hover:shadow-elegant'}`}>
                   <button onClick={() => setExpandedCharacter(isExpanded ? null : character.name)} className="w-full p-4 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-inset focus-visible:outline-burgundy-600 sm:p-5" aria-expanded={isExpanded} aria-controls={detailId}>
                     <span className="flex items-center gap-3">
-                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold-300 bg-gold-50 font-display text-sm font-semibold text-burgundy-800 shadow-inner">{character.initials}</span>
+                      {character.image ? (
+                        <span className="group/portrait relative z-10 flex h-20 w-20 shrink-0 items-center justify-center">
+                          <img src={character.image} alt={`Retrato de ${character.name}`} style={{ objectPosition: character.imagePosition ?? '50% 30%', transition: 'transform 850ms cubic-bezier(0.22, 0.61, 0.36, 1), box-shadow 650ms ease-out' }} className="relative z-0 h-20 w-20 origin-top-left rounded-full border-2 border-gold-300 object-cover shadow-sm transition-[transform,box-shadow] group-hover/portrait:z-30 group-hover/portrait:scale-[2.4] group-hover/portrait:shadow-2xl group-focus-within/portrait:z-30 group-focus-within/portrait:scale-[2.4] group-focus-within/portrait:shadow-2xl" />
+                        </span>
+                      ) : (
+                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold-300 bg-gold-50 font-display text-sm font-semibold text-burgundy-800 shadow-inner">{character.initials}</span>
+                      )}
                       <span className="min-w-0 flex-1">
                         <span className="block font-display text-lg font-semibold leading-tight text-burgundy-800">{character.name}</span>
-                        {character.nickname && <span className="mt-0.5 block text-xs font-medium text-charcoal-500">{character.nickname}</span>}
                       </span>
                       <ChevronDown className={`h-4 w-4 shrink-0 text-burgundy-600 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
                     </span>

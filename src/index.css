@@ -11,6 +11,7 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
@@ -18,6 +19,7 @@ body {
 
 #root {
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Custom scrollbar */
@@ -56,7 +58,7 @@ body {
   color: #f0e5d3;
 }
 
-:root[data-theme='dark'] .min-h-screen.bg-gradient-to-br {
+:root[data-theme='dark'] .min-h-dvh.bg-gradient-to-br {
   background-image: linear-gradient(135deg, #2b2520 0%, #352c25 52%, #2d2722 100%) !important;
 }
 
@@ -199,6 +201,18 @@ body {
   background-image: linear-gradient(90deg, #3a3129, #342b24) !important;
 }
 
+:root[data-theme='dark'] .mise-finale {
+  border-color: #8b7045;
+  background-image: linear-gradient(135deg, #493e33 0%, #3a3129 58%, #302821 100%) !important;
+  color: #f0e5d3;
+}
+
+:root[data-theme='dark'] .mise-finale-item {
+  border-color: #80683d;
+  background-color: #493b2b;
+  color: #f0e5d3;
+}
+
 :root[data-theme='dark'] ::-webkit-scrollbar-track {
   background: #2b2520;
 }
@@ -214,11 +228,12 @@ body {
 }
 
 /* Custom animations */
-.violeta-lined-paper {
+.violeta-aged-paper {
+  background-color: #f5e9ce !important;
   background-image:
-    linear-gradient(90deg, transparent 0 3.1rem, rgb(170 72 65 / 36%) 3.1rem 3.18rem, transparent 3.18rem),
-    repeating-linear-gradient(180deg, transparent 0 1.72rem, rgb(137 164 189 / 24%) 1.72rem 1.79rem) !important;
-  background-position: 0 0, 0 2.95rem;
+    radial-gradient(ellipse at 16% 8%, rgb(255 252 237 / 72%), transparent 45%),
+    radial-gradient(ellipse at 88% 92%, rgb(184 146 91 / 11%), transparent 40%),
+    linear-gradient(135deg, #fbf3df 0%, #f3e5c8 54%, #f8edda 100%) !important;
 }
 
 .violeta-handwriting {
@@ -256,6 +271,16 @@ body {
   perspective: 1200px;
 }
 
+.violeta-open-spread {
+  animation: violetaBookOpen 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  transform-origin: top center;
+}
+
+@keyframes violetaBookOpen {
+  from { opacity: 0; transform: perspective(900px) rotateX(7deg) scale(0.97); }
+  to { opacity: 1; transform: perspective(900px) rotateX(0) scale(1); }
+}
+
 .violeta-page-flip {
   position: absolute;
   z-index: 10;
@@ -263,6 +288,13 @@ body {
   transform-origin: left center;
   backface-visibility: hidden;
   animation: violetaPageTurn 520ms cubic-bezier(0.35, 0.02, 0.55, 1) both;
+}
+
+@media (min-width: 640px) {
+  .violeta-page-flip {
+    inset-inline-start: 50%;
+    width: 50%;
+  }
 }
 
 .violeta-page-flip-back {
@@ -315,6 +347,84 @@ body {
 
 .cut-piece-split {
   animation: cutPieceSplit 380ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
+}
+
+.cut-board-complete {
+  animation: cutBoardComplete 900ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  border-color: #c6a62e;
+}
+
+.cut-ingredient-complete {
+  animation: cutIngredientComplete 800ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.cut-completion-spark {
+  color: #fff3bd;
+  font-size: 1.25rem;
+  filter: drop-shadow(0 1px 3px rgb(106 72 19 / 45%));
+  animation: cutCompletionSpark 850ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.cut-completion-spark-delay-1 { animation-delay: 70ms; }
+.cut-completion-spark-delay-2 { animation-delay: 120ms; }
+.cut-completion-spark-delay-3 { animation-delay: 40ms; }
+
+.mise-finale {
+  animation: miseFinaleReveal 750ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.mise-finale-seal {
+  animation: miseFinaleSeal 700ms cubic-bezier(0.2, 1.35, 0.4, 1) 100ms both;
+}
+
+.mise-finale-item {
+  animation: miseFinaleItem 520ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.mise-finale-spark {
+  animation: miseFinaleSpark 900ms ease-out both;
+}
+
+.mise-finale-spark-right { animation-delay: 140ms; }
+
+@keyframes miseFinaleReveal {
+  from { opacity: 0; transform: translateY(12px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes miseFinaleSeal {
+  0% { opacity: 0; transform: scale(0.35) rotate(-18deg); }
+  72% { opacity: 1; transform: scale(1.12) rotate(4deg); }
+  100% { opacity: 1; transform: scale(1) rotate(0); }
+}
+
+@keyframes miseFinaleItem {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes miseFinaleSpark {
+  0% { opacity: 0; transform: scale(0.5) rotate(-25deg); }
+  35% { opacity: 1; transform: scale(1.15) rotate(12deg); }
+  100% { opacity: 0.6; transform: scale(1) rotate(0); }
+}
+
+@keyframes cutBoardComplete {
+  0% { transform: scale(1); box-shadow: inset 0 0 0 rgb(255 245 194 / 0%); }
+  35% { transform: scale(1.025); box-shadow: inset 0 0 30px rgb(255 245 194 / 48%), 0 0 0 4px rgb(198 166 46 / 24%); }
+  100% { transform: scale(1); box-shadow: inset 0 0 0 rgb(255 245 194 / 0%); }
+}
+
+@keyframes cutIngredientComplete {
+  0% { filter: brightness(1); transform: scale(1); }
+  38% { filter: brightness(1.28); transform: scale(1.1); }
+  100% { filter: brightness(1); transform: scale(1); }
+}
+
+@keyframes cutCompletionSpark {
+  0% { opacity: 0; transform: translateY(8px) scale(0.35) rotate(-25deg); }
+  35% { opacity: 1; transform: translateY(-3px) scale(1.15) rotate(10deg); }
+  100% { opacity: 0; transform: translateY(-22px) scale(0.7) rotate(35deg); }
 }
 
 @keyframes cutPieceSplit {
@@ -383,9 +493,20 @@ body {
     animation-duration: 1ms;
   }
 
+  .violeta-open-spread {
+    animation-duration: 1ms;
+  }
+
   .cut-flash,
   .cut-ingredient-shake,
   .cut-piece-split,
+  .cut-board-complete,
+  .cut-ingredient-complete,
+  .cut-completion-spark,
+  .mise-finale,
+  .mise-finale-seal,
+  .mise-finale-item,
+  .mise-finale-spark,
   .cut-knife-sweep-horizontal,
   .cut-knife-sweep-vertical,
   .cut-mark-horizontal,

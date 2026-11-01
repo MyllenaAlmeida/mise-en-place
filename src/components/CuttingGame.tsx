@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Check, MoveHorizontal, MoveVertical, RotateCcw, Sparkles } from 'lucide-react';
+import { Check, ChefHat, MoveHorizontal, MoveVertical, RotateCcw, Sparkles } from 'lucide-react';
 import PumpkinIcon from './PumpkinIcon';
 
 type CutDirection = 'horizontal' | 'vertical';
@@ -9,27 +9,31 @@ const stations: Array<{
   cut: string;
   instruction: string;
   hint: string;
+  passesRequired: number;
   axis: CutDirection | 'grid';
 }> = [
   {
     ingredient: 'Cenoura',
     cut: 'Julienne',
-    instruction: 'Deslize a faca no sentido do comprimento para formar tiras finas.',
-    hint: 'A cenoura pede passadas longas, de um lado ao outro.',
+    instruction: 'Faça 2 passadas na horizontal: arraste da esquerda para a direita (← →).',
+    hint: 'Arraste de um lado ao outro sobre a cenoura.',
+    passesRequired: 2,
     axis: 'horizontal',
   },
   {
     ingredient: 'Aipo',
     cut: 'Brunoise',
-    instruction: 'Cruze cortes curtos para transformar o talo em cubinhos de 2 mm.',
-    hint: 'Faça dois cortes em cada direção para formar os cubinhos.',
+    instruction: 'Faça 2 passadas na horizontal (← →) e depois 2 na vertical, de cima para baixo (↑ ↓).',
+    hint: 'Faça duas passadas de um lado ao outro; depois, duas de cima para baixo.',
+    passesRequired: 4,
     axis: 'grid',
   },
   {
     ingredient: 'Abóbora',
     cut: 'Cubos de 2 cm',
-    instruction: 'Desenhe dois cortes em cada direção para chegar a cubos uniformes.',
-    hint: 'Para formar cubos, cruze cortes horizontais e verticais.',
+    instruction: 'Faça 2 passadas na horizontal (← →) e depois 2 na vertical, de cima para baixo (↑ ↓).',
+    hint: 'Faça duas passadas de um lado ao outro; depois, duas de cima para baixo.',
+    passesRequired: 4,
     axis: 'grid',
   },
 ];
@@ -38,6 +42,7 @@ function Ingredient({
   stationIndex,
   cuts,
   cutEffect,
+  done,
   onStart,
   onEnd,
   onCancel,
@@ -46,6 +51,7 @@ function Ingredient({
   stationIndex: number;
   cuts: { horizontal: number; vertical: number };
   cutEffect: { id: number; direction: CutDirection } | null;
+  done: boolean;
   onStart: (event: React.PointerEvent<HTMLDivElement>) => void;
   onEnd: (event: React.PointerEvent<HTMLDivElement>) => void;
   onCancel: () => void;
@@ -59,7 +65,7 @@ function Ingredient({
   const pieceColumns = station.axis === 'vertical' ? cuts.vertical + 1 : station.axis === 'grid' ? cuts.vertical + 1 : 1;
 
   return (
-    <div className="relative flex h-40 items-center justify-center overflow-hidden rounded-xl border-2 border-[#98794f] bg-[#d8c29b] shadow-inner sm:h-52 lg:h-56" aria-label="Tábua de corte">
+    <div className={`relative flex h-40 items-center justify-center overflow-hidden rounded-xl border-2 border-[#98794f] bg-[#d8c29b] shadow-inner sm:h-52 lg:h-56 ${done ? 'cut-board-complete' : ''}`} aria-label="Tábua de corte">
       <div className="pointer-events-none absolute inset-2 rounded-lg border border-[#aa8c61]/50" />
       <div
         key={`ingredient-${cutEffect?.id ?? 0}`}
@@ -70,7 +76,7 @@ function Ingredient({
         onPointerUp={onEnd}
         onPointerCancel={onCancel}
         onKeyDown={onKeyDown}
-        className={`relative z-10 flex touch-none select-none items-center justify-center overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-burgundy-600 ${cutEffect ? 'cut-ingredient-shake' : ''} ${isPumpkin ? 'h-28 w-28 sm:h-36 sm:w-36' : 'h-14 w-[76%] sm:h-16 lg:h-[4.5rem]'} ${station.axis === 'horizontal' ? 'cursor-ew-resize' : station.axis === 'vertical' ? 'cursor-ns-resize' : 'cursor-crosshair'}`}
+        className={`relative z-10 flex touch-none select-none items-center justify-center overflow-hidden outline-none focus-visible:ring-2 focus-visible:ring-burgundy-600 ${cutEffect ? 'cut-ingredient-shake' : ''} ${done ? 'cut-ingredient-complete' : ''} ${isPumpkin ? 'h-28 w-28 sm:h-36 sm:w-36' : 'h-14 w-[76%] sm:h-16 lg:h-[4.5rem]'} ${station.axis === 'horizontal' ? 'cursor-ew-resize' : station.axis === 'vertical' ? 'cursor-ns-resize' : 'cursor-crosshair'}`}
       >
         {cutEffect && <span key={`flash-${cutEffect.id}`} className="cut-flash pointer-events-none absolute inset-0 z-10 rounded-[inherit]" aria-hidden="true" />}
         {cutEffect && <span key={`knife-${cutEffect.id}`} className={`pointer-events-none absolute z-30 text-3xl drop-shadow-lg ${cutEffect.direction === 'horizontal' ? 'cut-knife-sweep-horizontal' : 'cut-knife-sweep-vertical'}`} aria-hidden="true">🔪</span>}
@@ -94,9 +100,15 @@ function Ingredient({
 
       <div className="pointer-events-none absolute bottom-2 left-3 right-3 flex justify-between text-[0.62rem] font-semibold uppercase tracking-wider text-[#755b3a]">
         <span>{station.ingredient}</span>
-        <span>{Math.min(totalCuts, station.axis === 'grid' ? 4 : 3)} cortes</span>
+        <span>{Math.min(totalCuts, station.passesRequired)} {totalCuts === 1 ? 'passada' : 'passadas'}</span>
       </div>
       <div className="pointer-events-none absolute right-4 top-3 text-xs text-[#755b3a]/70" aria-hidden="true">✦</div>
+      {done && <>
+        <span className="cut-completion-spark pointer-events-none absolute left-[16%] top-[24%] z-30" aria-hidden="true">✦</span>
+        <span className="cut-completion-spark cut-completion-spark-delay-1 pointer-events-none absolute right-[17%] top-[22%] z-30" aria-hidden="true">✧</span>
+        <span className="cut-completion-spark cut-completion-spark-delay-2 pointer-events-none absolute bottom-[25%] left-[27%] z-30" aria-hidden="true">✧</span>
+        <span className="cut-completion-spark cut-completion-spark-delay-3 pointer-events-none absolute bottom-[25%] right-[28%] z-30" aria-hidden="true">✦</span>
+      </>}
     </div>
   );
 }
@@ -105,13 +117,13 @@ export default function CuttingGame() {
   const [stationIndex, setStationIndex] = useState(0);
   const [cuts, setCuts] = useState({ horizontal: 0, vertical: 0 });
   const [cutEffect, setCutEffect] = useState<{ id: number; direction: CutDirection } | null>(null);
-  const [message, setMessage] = useState('Arraste a faca sobre o ingrediente para cortar.');
+  const [message, setMessage] = useState('Arraste sobre o ingrediente para fazer o primeiro corte.');
   const [finished, setFinished] = useState(false);
   const pointerStart = useRef<{ x: number; y: number } | null>(null);
   const station = stations[stationIndex]!;
   const stationDone = station.axis === 'grid'
     ? cuts.horizontal >= 2 && cuts.vertical >= 2
-    : cuts[station.axis] >= 3;
+    : cuts[station.axis] >= station.passesRequired;
   const assistedDirection: CutDirection = station.axis === 'vertical'
     ? 'vertical'
     : station.axis === 'grid' && cuts.horizontal >= 2 ? 'vertical' : 'horizontal';
@@ -128,12 +140,12 @@ export default function CuttingGame() {
     setCuts(nextCuts);
     const complete = station.axis === 'grid'
       ? nextCuts.horizontal >= 2 && nextCuts.vertical >= 2
-      : nextCuts[station.axis] >= 3;
-    const totalNeeded = station.axis === 'grid' ? 4 : 3;
+      : nextCuts[station.axis] >= station.passesRequired;
+    const totalNeeded = station.passesRequired;
     const totalMade = nextCuts.horizontal + nextCuts.vertical;
     setMessage(complete
       ? `✨ ${station.cut} pronto! Corte perfeito, chef!`
-      : `Tchac! Mais um corte preciso — ${totalMade} de ${totalNeeded}.`);
+      : `Tchac! Mais uma passada — ${totalMade} de ${totalNeeded}.`);
   };
 
   const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -150,7 +162,7 @@ export default function CuttingGame() {
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
     if (Math.hypot(dx, dy) < 26) {
-      setMessage('Deslize a faca sobre o ingrediente para fazer o corte.');
+      setMessage('Arraste um pouco mais para registrar o corte.');
       return;
     }
     registerCut(Math.abs(dx) > Math.abs(dy) ? 'horizontal' : 'vertical');
@@ -167,7 +179,7 @@ export default function CuttingGame() {
     setStationIndex(0);
     setCuts({ horizontal: 0, vertical: 0 });
     setCutEffect(null);
-    setMessage('Arraste a faca sobre o ingrediente para cortar.');
+    setMessage('Arraste sobre o ingrediente para fazer o primeiro corte.');
     setFinished(false);
   };
 
@@ -179,7 +191,7 @@ export default function CuttingGame() {
     setStationIndex((current) => current + 1);
     setCuts({ horizontal: 0, vertical: 0 });
     setCutEffect(null);
-    setMessage('Arraste a faca sobre o ingrediente para cortar.');
+    setMessage('Arraste sobre o ingrediente para fazer o primeiro corte.');
   };
 
   return (
@@ -192,9 +204,21 @@ export default function CuttingGame() {
       </div>
 
       {finished ? (
-        <div className="rounded-xl bg-sage-100 p-4 text-sage-900">
-          <div className="flex items-center gap-2 font-semibold"><Check className="h-5 w-5" /> Bancada pronta para o serviço!</div>
-          <p className="mt-1 text-sm">Você preparou cenoura julienne, aipo brunoise e abóbora em cubos.</p>
+        <div className="mise-finale relative overflow-hidden rounded-2xl border border-gold-300 bg-gradient-to-br from-[#fffaf3] via-[#f5ead8] to-[#eee0c8] p-4 text-[#4a3928] shadow-soft" aria-live="polite">
+          <Sparkles className="mise-finale-spark mise-finale-spark-left absolute left-4 top-5 h-5 w-5 text-gold-700" aria-hidden="true" />
+          <Sparkles className="mise-finale-spark mise-finale-spark-right absolute right-4 top-8 h-4 w-4 text-gold-700" aria-hidden="true" />
+          <div className="relative text-center">
+            <div className="mise-finale-seal mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-gold-400 bg-gold-100 text-burgundy-800 shadow-inner">
+              <ChefHat className="h-7 w-7" aria-hidden="true" />
+            </div>
+            <div className="mt-3 flex items-center justify-center gap-2 font-display text-lg font-semibold text-burgundy-800"><Check className="h-5 w-5 text-gold-800" /> Mise en place concluído!</div>
+            <p className="mt-1 text-sm">Sua bancada está pronta para o serviço.</p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              {['🥕 Julienne', '🌿 Brunoise', '🎃 Cubos'].map((item, index) => (
+                <span key={item} style={{ animationDelay: `${index * 120}ms` }} className="mise-finale-item rounded-full border border-gold-300/80 bg-white/60 px-3 py-1.5 text-xs font-semibold text-charcoal-800 shadow-sm">{item}</span>
+              ))}
+            </div>
+          </div>
           <button onClick={resetGame} className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-burgundy-700 hover:text-burgundy-900"><RotateCcw className="h-4 w-4" /> Fazer de novo</button>
         </div>
       ) : (
@@ -204,6 +228,7 @@ export default function CuttingGame() {
             stationIndex={stationIndex}
             cuts={cuts}
             cutEffect={cutEffect}
+            done={stationDone}
             onStart={handlePointerDown}
             onEnd={handlePointerUp}
             onCancel={() => { pointerStart.current = null; }}

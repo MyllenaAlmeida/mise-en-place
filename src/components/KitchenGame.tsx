@@ -127,7 +127,7 @@ export default function KitchenGame({ theme }: { theme: ReaderSettings['theme'] 
         <div className={`mb-4 grid grid-cols-2 gap-1 rounded-xl p-1 ${softSurface}`} role="tablist" aria-label="Modo do desafio">
           <button id="tab-cuts" role="tab" aria-selected={mode === 'cuts'} aria-controls="panel-cuts" onClick={() => setMode('cuts')} className={`rounded-lg px-2.5 py-2.5 text-left transition sm:px-3 ${mode === 'cuts' ? `${selectedTab} shadow-soft` : inactiveTab}`}>
             <span className="block text-sm font-semibold">Fazer os cortes</span>
-            <span className="mt-1 block text-[0.68rem] font-normal leading-snug opacity-80">Arraste a faca para praticar julienne, brunoise e cubos.</span>
+            <span className="mt-1 block text-[0.68rem] font-normal leading-snug opacity-80">Siga as direções para praticar julienne, brunoise e cubos.</span>
           </button>
           <button id="tab-quiz" role="tab" aria-selected={mode === 'quiz'} aria-controls="panel-quiz" onClick={() => setMode('quiz')} className={`rounded-lg px-2.5 py-2.5 text-left transition sm:px-3 ${mode === 'quiz' ? `${selectedTab} shadow-soft` : inactiveTab}`}>
             <span className="block text-sm font-semibold">Prova da chef</span>
@@ -138,7 +138,7 @@ export default function KitchenGame({ theme }: { theme: ReaderSettings['theme'] 
         <div id={`panel-${mode}`} role="tabpanel" aria-labelledby={`tab-${mode}`}>
           {mode === 'cuts' ? (
             <>
-              <p className={`mb-4 text-sm leading-relaxed ${theme === 'dark' ? 'text-[#c9baa5]' : 'text-charcoal-600'}`}>Arraste a faca sobre cada ingrediente para cortá-lo. Complete o preparo de cenoura, aipo e abóbora.</p>
+              <p className={`mb-4 text-sm leading-relaxed ${theme === 'dark' ? 'text-[#c9baa5]' : 'text-charcoal-600'}`}>Arraste o mouse ou o dedo sobre o ingrediente, na direção indicada. No teclado, pressione Enter ou Espaço quando o ingrediente estiver selecionado.</p>
               <CuttingGame />
             </>
           ) : <ChefQuiz />}

@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { ArrowDown, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, BookOpen, ChefHat, ChevronDown, ChevronRight } from 'lucide-react';
 import type { Chapter } from '../types';
 import type { ReaderSettings } from '../types';
 import type { BookMetadata } from '../hooks/useChapters';
@@ -10,7 +10,6 @@ interface HomePageProps {
   chapters: Chapter[];
   bookInfo: BookMetadata | null;
   settings: ReaderSettings;
-  resumeChapterIndex: number;
   onStartReading: (chapterIndex: number) => void;
   onOpenSettings: () => void;
   onOpenCharacters: () => void;
@@ -25,8 +24,21 @@ function getChapterKicker(label: string) {
   return number ? `Capítulo ${number.padStart(2, '0')}` : 'Capítulo';
 }
 
-export default function HomePage({ chapters, bookInfo, settings, resumeChapterIndex, onStartReading, onOpenSettings, onOpenCharacters, onOpenKitchen, onOpenRecipes }: HomePageProps) {
+export default function HomePage({ chapters, bookInfo, settings, onStartReading, onOpenSettings, onOpenCharacters, onOpenKitchen, onOpenRecipes }: HomePageProps) {
   const [summaryExpanded, setSummaryExpanded] = useState(false);
+  const [clocheOpen, setClocheOpen] = useState(false);
+  const clocheRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const cloche = clocheRef.current;
+    if (!cloche) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      setClocheOpen(entry.isIntersecting);
+    }, { threshold: 0.35 });
+
+    observer.observe(cloche);
+    return () => observer.disconnect();
+  }, []);
   const palette = {
     light: {
       page: 'from-ivory-100 via-ivory-50 to-ivory-100',
@@ -59,12 +71,11 @@ export default function HomePage({ chapters, bookInfo, settings, resumeChapterIn
       control: 'border-charcoal-600 bg-charcoal-800 text-ivory-200 hover:bg-charcoal-700',
     },
   }[settings.theme];
-  const resumeChapter = chapters[resumeChapterIndex] ?? chapters[0];
   const chapterDescription = bookInfo?.description || 'Uma cozinha de alta gastronomia, duas mulheres determinadas e uma história que se constrói entre aromas, escolhas e novos começos.';
   const summaryParagraphs = chapterDescription.split(/\n\s*\n/);
 
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${palette.page}`}>
+    <div className={`min-h-dvh bg-gradient-to-br ${palette.page}`}>
       <SiteHeader
         title={bookInfo?.title || 'Mise en Place'}
         theme={settings.theme}
@@ -84,17 +95,40 @@ export default function HomePage({ chapters, bookInfo, settings, resumeChapterIn
       <main id="inicio" className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-8 sm:pt-10">
         <section aria-label="Boas-vindas">
           <div className="story-hero relative flex min-h-[360px] flex-col justify-between overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-burgundy-800 via-burgundy-700 to-[#68231f] p-6 text-ivory-50 shadow-elegant sm:min-h-[410px] sm:p-9 lg:p-11">
-            <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-ivory-50/15" aria-hidden="true" />
-            <div className="absolute -right-8 -top-12 h-48 w-48 rounded-full border border-ivory-50/15" aria-hidden="true" />
-            <div className="absolute -bottom-20 right-5 h-44 w-44 rounded-full border-[18px] border-ivory-50/10" aria-hidden="true" />
-            <div className="relative">
-              <span className="inline-flex items-center gap-2 rounded-full border border-ivory-50/25 bg-ivory-50/10 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.17em] text-ivory-100">
+            <div ref={clocheRef} className="pointer-events-none absolute bottom-11 right-0 z-10 p-2 text-gold-200/35 sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:text-gold-200/45 lg:right-5" aria-hidden="true">
+              <svg className="h-auto w-40 sm:w-64 lg:w-80" viewBox="52 35 116 132" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <g stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="0.8">
+                  <g style={{ transformBox: 'fill-box', transformOrigin: 'center bottom', transform: clocheOpen ? 'translate(-5px, -14px) rotate(-8deg)' : 'translate(0, 0) rotate(0deg)', transition: 'transform 800ms cubic-bezier(0.22, 0.61, 0.36, 1)' }}>
+                    <path d="M74 117c1-21 16-37 36-37s35 16 36 37" />
+                    <path d="M110 80v-8" />
+                    <path d="M105 71c0-3 2-5 5-5s5 2 5 5-2 5-5 5-5-2-5-5Z" />
+                    <path d="M72 117h76" />
+                    <path d="M80 113c2-14 11-25 23-29" opacity="0.55" />
+                  </g>
+                  <path d="M67 123c10 7 76 7 86 0" />
+                  <path d="M73 128c14 7 60 7 74 0" />
+                  <path d="M91 136c9 4 29 4 38 0" />
+                  <path d="M98 141h24" />
+                  <g className={clocheOpen ? 'opacity-100' : 'opacity-0'} style={{ transition: 'opacity 650ms ease-in-out' }}>
+                    <path d="M95 108c-5-5 5-7 0-12" strokeDasharray="1.5 2.5" />
+                    <path d="M110 105c-5-5 5-7 0-12" strokeDasharray="1.5 2.5" />
+                    <path d="M125 108c-5-5 5-7 0-12" strokeDasharray="1.5 2.5" />
+                    <path d="M87 124c10-4 36-4 46 0" />
+                  </g>
+                  <path d="M56 91v9m-4.5-4.5h9" opacity="0.7" />
+                  <path d="M164 83v8m-4-4h8" opacity="0.7" />
+                  <path d="M156 145v6m-3-3h6" opacity="0.7" />
+                </g>
+              </svg>
+            </div>
+            <div className="relative z-20">
+              <span className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-ivory-50/25 bg-ivory-50/10 px-3 py-1.5 text-[0.56rem] font-semibold uppercase tracking-[0.1em] text-ivory-100 sm:w-auto sm:justify-start sm:text-[0.68rem] sm:tracking-[0.17em]">
                 <BookOpen className="h-3.5 w-3.5" /> Romance · culinária · recomeços
               </span>
               <h1 className="mt-6 max-w-xl font-display text-3xl font-semibold leading-[1.08] sm:text-5xl">
                 Uma história que se serve <span className="text-gold-200">aos poucos.</span>
               </h1>
-              <p className="mt-4 max-w-3xl font-serif leading-relaxed text-ivory-100/90" style={{ fontSize: `${settings.fontSize}px`, lineHeight: 1.55 }}>
+              <p className="mt-4 hidden max-w-3xl font-serif leading-relaxed text-ivory-100/90 sm:block" style={{ fontSize: `${settings.fontSize}px`, lineHeight: 1.55 }}>
                 Lorena encontra na disciplina do Racine sua armadura; Eduarda, afastada da polícia, busca na gastronomia um recomeço.
               </p>
               <button
@@ -111,12 +145,7 @@ export default function HomePage({ chapters, bookInfo, settings, resumeChapterIn
                 {summaryParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
               </div>
             </div>
-            <div className="relative mt-8 flex flex-wrap items-center gap-3">
-              {resumeChapter && (
-                <button onClick={() => onStartReading(resumeChapterIndex)} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-ivory-50 px-5 py-3 text-sm font-semibold text-burgundy-800 shadow-soft transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-200 sm:w-auto">
-                  <BookOpen className="h-4 w-4" /> {resumeChapterIndex > 0 ? 'Retomar leitura:' : 'Começar leitura:'} {resumeChapter.label}
-                </button>
-              )}
+            <div className="relative z-20 mt-8 flex flex-wrap items-center gap-3">
               <a href="#sumario" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-ivory-50/35 px-5 py-3 text-sm font-semibold text-ivory-50 transition hover:bg-ivory-50/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-200 sm:w-auto">
                 Explorar capítulos <ArrowDown className="h-4 w-4" />
               </a>
@@ -143,7 +172,7 @@ export default function HomePage({ chapters, bookInfo, settings, resumeChapterIn
                   className={`group flex min-h-[118px] items-center gap-4 rounded-2xl border p-4 text-left shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-elegant focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy-600 sm:p-5 ${palette.surface}`}
                 >
                   <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-display text-base font-semibold ${settings.theme === 'dark' ? 'bg-[#493b27] text-[#e8c986]' : isExtra ? 'bg-gold-100 text-gold-800' : 'bg-burgundy-100 text-burgundy-700'}`}>
-                    {isExtra ? '✦' : String(index + 1).padStart(2, '0')}
+                    {isExtra ? <ChefHat className="h-5 w-5" aria-hidden="true" /> : String(index + 1).padStart(2, '0')}
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className={`block truncate font-display font-semibold ${palette.text}`} style={{ fontSize: `${Math.max(14, settings.fontSize - 2)}px` }}>{chapter.label}</span>

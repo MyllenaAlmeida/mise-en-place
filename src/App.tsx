@@ -44,7 +44,7 @@ function App() {
   
   const [settings, setSettings] = useLocalStorage<ReaderSettings>('readerSettings', {
     fontSize: 18,
-    theme: 'light',
+    theme: 'sepia',
   });
 
   const { chapters, bookInfo, isLoading: chaptersLoading } = useChapters();
@@ -187,7 +187,7 @@ function App() {
   // Show loading screen or home page
   if (chaptersLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-ivory-50 via-ivory-100 to-ivory-50 flex items-center justify-center">
+      <div className="min-h-dvh bg-gradient-to-br from-amber-50 via-amber-100 to-amber-50 flex items-center justify-center">
         <div className="text-center animate-fade-in">
           <div className="text-6xl mb-6 animate-bounce">📖</div>
           <div className="text-burgundy-600 text-2xl font-display font-semibold mb-2">
@@ -206,7 +206,7 @@ function App() {
     if (isKitchenOpen) {
       return (
         <>
-          <div className="flex h-screen overflow-hidden">
+          <div className="flex h-dvh overflow-hidden">
             {renderSidebar('kitchen')}
             <div className="h-full min-w-0 flex-1 overflow-y-auto">
               <KitchenPage
@@ -235,7 +235,7 @@ function App() {
     if (isCharactersOpen) {
       return (
         <>
-          <div className="flex h-screen overflow-hidden">
+          <div className="flex h-dvh overflow-hidden">
             {renderSidebar('characters')}
             <div className="h-full min-w-0 flex-1 overflow-y-auto">
               <CharactersPage
@@ -260,7 +260,7 @@ function App() {
     if (isRecipesOpen) {
       return (
         <>
-          <div className="flex h-screen overflow-hidden">
+          <div className="flex h-dvh overflow-hidden">
             {renderSidebar('recipes')}
             <div className="h-full min-w-0 flex-1 overflow-y-auto">
               <RecipesPage
@@ -289,14 +289,13 @@ function App() {
 
     return (
       <>
-        <div className="flex h-screen overflow-hidden">
+        <div className="flex h-dvh overflow-hidden">
           {renderSidebar('home')}
           <div className="h-full min-w-0 flex-1 overflow-y-auto">
             <HomePage
               chapters={chapters}
               bookInfo={bookInfo}
               settings={settings}
-              resumeChapterIndex={Math.min(currentChapterIndex, Math.max(chapters.length - 1, 0))}
               onStartReading={(chapterIndex) => {
                 setCurrentChapterIndex(chapterIndex);
                 setIsReading(true);
@@ -328,7 +327,7 @@ function App() {
   const currentChapter = chapters[currentChapterIndex];
 
   return (
-    <div className={`min-h-screen ${themeClasses.bg} ${themeClasses.text}`}>
+    <div className={`min-h-dvh ${themeClasses.bg} ${themeClasses.text}`}>
       <SiteHeader
         title={bookInfo?.title || 'Mise en Place'}
         theme={settings.theme}
@@ -364,10 +363,10 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100vh-85px)]">
+      <div className="flex h-[calc(100dvh-70px)] min-h-0 sm:h-[calc(100dvh-86px)]">
         {renderSidebar('reader')}
         
-        <main className="flex-1 flex flex-col">
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
           {currentChapter && (
             <ChapterViewer
               chapterUrl={currentChapter.href}

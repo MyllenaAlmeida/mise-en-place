@@ -32,7 +32,7 @@ Um leitor de e-books elegante e confortável em React, projetado especificamente
   - Largura do contêiner (400px - 900px)
 
 ### Navegação & Organização
-- ✅ Sidebar retrátil com lista de 14 capítulos (Preface, Chapters 1-12, Afterword)
+- ✅ Sidebar retrátil com lista dos Chapters 1-13
 - ✅ Indicador de progresso de leitura (barra de progresso superior)
 - ✅ Persistência do último capítulo lido via `localStorage`
 - ✅ Navegação por teclado (setas ← → e Espaço)
@@ -46,7 +46,7 @@ Um leitor de e-books elegante e confortável em React, projetado especificamente
 
 A fanfic "Mise en Place" contém:
 - **Preface**: Introdução
-- **Chapters 1-12**: História principal
+- **Chapters 1-13**: História principal
   - Chapter 1: Raízes e Memórias
   - Chapter 2: O fio da faca
   - Chapter 3: Recomeço
@@ -59,6 +59,7 @@ A fanfic "Mise en Place" contém:
   - Chapter 10: After
   - Chapter 11: Um Dia de Cada Vez
   - Chapter 12: Pensamentos
+  - Chapter 13: Tulipas Brancas
 - **Afterword**: Conclusão
 
 ## 🛠️ Tecnologias

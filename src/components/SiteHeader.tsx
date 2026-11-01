@@ -46,7 +46,7 @@ export default function SiteHeader({ title, theme, activePage, brandLabel, onBra
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:h-20 sm:px-8">
         <button onClick={onBrandClick} className="group flex min-w-0 cursor-pointer items-center gap-3 rounded-xl py-1 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-burgundy-600" aria-label={brandLabel} title="Voltar para a página inicial">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-burgundy-700 text-ivory-50 shadow-soft transition-transform group-hover:scale-105 group-active:scale-95"><UtensilsCrossed className="h-5 w-5" /></span>
-          <span className={`block min-w-0 truncate font-display text-base font-semibold leading-tight decoration-1 underline-offset-4 group-hover:underline sm:text-xl ${palette.brand}`}>{title}</span>
+          <span className={`hidden min-w-0 truncate font-display text-base font-semibold leading-tight decoration-1 underline-offset-4 group-hover:underline sm:block sm:text-xl ${palette.brand}`}>{title}</span>
         </button>
         <nav aria-label="Navegação principal" className="flex shrink-0 items-center gap-0.5 sm:gap-1">
           {onBackHome && (
