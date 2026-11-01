@@ -1,0 +1,79 @@
+{
+  "title": "Mise En Place",
+  "author": "littleslightlymad",
+  "description": "Proprietária e chef do renomado e premiado restaurante vegano Racine, Lorena Esteves não tolera desordem, erros ou sentimentalismos. Para ela, o rigor técnico na cozinha é a armadura que a mantém firme. Após cortar laços com a família de sangue e reconstruir a vida do zero, ela tem ao seu lado apenas a amiga e sócia, Maggye.\n\nNão muito distante dali, Eduarda tenta reorganizar a vida. Afastada da polícia por burnout, com as contas chegando e dividindo apartamento com o amigo Paulinho, ela decide mudar de rumo, mexer em umas economias e ingressar no curso de gastronomia. A culinária sempre foi uma paixão ligada à memória de sua falecida mãe Violeta, mas a rotina exaustiva da corporação nunca lhe permitiu praticar. Agora, diante dessas circunstâncias, o momento de colocar as mãos na massa e fazer o mise en place da sua vida chegou.",
+  "chapters": [
+    {
+      "id": "chapter-1",
+      "title": "Chapter 1: Raízes e Memórias",
+      "file": "01-chapter-1.html",
+      "order": 1
+    },
+    {
+      "id": "chapter-2",
+      "title": "Chapter 2: O fio da faca",
+      "file": "02-chapter-2.html",
+      "order": 2
+    },
+    {
+      "id": "chapter-3",
+      "title": "Chapter 3: Recomeço",
+      "file": "03-chapter-3.html",
+      "order": 3
+    },
+    {
+      "id": "chapter-4",
+      "title": "Chapter 4: Fogo Brando",
+      "file": "04-chapter-4.html",
+      "order": 4
+    },
+    {
+      "id": "chapter-5",
+      "title": "Chapter 5: Confraternizar",
+      "file": "05-chapter-5.html",
+      "order": 5
+    },
+    {
+      "id": "chapter-6",
+      "title": "Chapter 6: Fora do Menu",
+      "file": "06-chapter-6.html",
+      "order": 6
+    },
+    {
+      "id": "chapter-7",
+      "title": "Chapter 7: Bala Juquinha",
+      "file": "07-chapter-7.html",
+      "order": 7
+    },
+    {
+      "id": "chapter-8",
+      "title": "Chapter 8: Respiração Quadrada",
+      "file": "08-chapter-8.html",
+      "order": 8
+    },
+    {
+      "id": "chapter-9",
+      "title": "Chapter 9: Habeas Copos",
+      "file": "09-chapter-9.html",
+      "order": 9
+    },
+    {
+      "id": "chapter-10",
+      "title": "Chapter 10: After",
+      "file": "10-chapter-10.html",
+      "order": 10
+    },
+    {
+      "id": "chapter-11",
+      "title": "Chapter 11: Um Dia de Cada Vez",
+      "file": "11-chapter-11.html",
+      "order": 11
+    },
+    {
+      "id": "chapter-12",
+      "title": "Chapter 12: Pensamentos",
+      "file": "12-chapter-12.html",
+      "order": 12
+    }
+  ]
+}

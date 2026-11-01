@@ -1,0 +1,99 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="ptBR">
+  <head>
+    <meta name="dtb:uid" content="4ddbf5b0-8237-43e7-b3c3-94d207970157"/>
+    <meta name="dtb:depth" content="2"/>
+    <meta name="dtb:generator" content="calibre (6.13.0)"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+  </head>
+  <docTitle>
+    <text>Mise En Place</text>
+  </docTitle>
+  <navMap>
+    <navPoint id="uq9w4uFSKupaXKrtxe8u2HB" playOrder="1">
+      <navLabel>
+        <text>Preface</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_000.xhtml"/>
+    </navPoint>
+    <navPoint id="u4B43PGzpkrMOrS9UGhUBc8" playOrder="2">
+      <navLabel>
+        <text>Chapter 1: Raízes e Memórias</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_002.xhtml"/>
+    </navPoint>
+    <navPoint id="uWRLiI6ltNIsWo77TZeAzL9" playOrder="3">
+      <navLabel>
+        <text>Chapter 2: O fio da faca</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_003.xhtml"/>
+    </navPoint>
+    <navPoint id="uzT9ntjrACQX6ePjLoDxRs6" playOrder="4">
+      <navLabel>
+        <text>Chapter 3: Recomeço</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_004.xhtml"/>
+    </navPoint>
+    <navPoint id="uAaBBYHOlesQPzFVN6TtCm4" playOrder="5">
+      <navLabel>
+        <text>Chapter 4: Fogo Brando</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_005.xhtml"/>
+    </navPoint>
+    <navPoint id="uAMNiiOhX9vXIQOKUUDTqT3" playOrder="6">
+      <navLabel>
+        <text>Chapter 5: Confraternizar</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_006.xhtml"/>
+    </navPoint>
+    <navPoint id="uo6rrQ38rI7qmrkXnEXaol8" playOrder="7">
+      <navLabel>
+        <text>Chapter 6: Fora do Menu</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_007.xhtml"/>
+    </navPoint>
+    <navPoint id="uK6GoRXryUimKZ92REeySa5" playOrder="8">
+      <navLabel>
+        <text>Chapter 7: Bala Juquinha</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_008.xhtml"/>
+    </navPoint>
+    <navPoint id="u5lSmzieQ5BSCrvSdCndyo7" playOrder="9">
+      <navLabel>
+        <text>Chapter 8: Respiração Quadrada</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_009.xhtml"/>
+    </navPoint>
+    <navPoint id="u3V7GVpQ7iqMVsXgdyMuxG5" playOrder="10">
+      <navLabel>
+        <text>Chapter 9: Habeas Copos</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_010.xhtml"/>
+    </navPoint>
+    <navPoint id="uuBNNDDpulA74JqqX4wlvK5" playOrder="11">
+      <navLabel>
+        <text>Chapter 10: After</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_011.xhtml"/>
+    </navPoint>
+    <navPoint id="uo5Hf8MP88MpRA8nMVZcPoB" playOrder="12">
+      <navLabel>
+        <text>Chapter 11: Um Dia de Cada Vez</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_012.xhtml"/>
+    </navPoint>
+    <navPoint id="uQek4H6SVTwj9ZFPCilFQXG" playOrder="13">
+      <navLabel>
+        <text>Chapter 12: Pensamentos</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_013.xhtml"/>
+    </navPoint>
+    <navPoint id="u8SkIFhsLFVzllekqQugqx9" playOrder="14">
+      <navLabel>
+        <text>Afterword</text>
+      </navLabel>
+      <content src="Mise_En_Place_split_014.xhtml"/>
+    </navPoint>
+  </navMap>
+</ncx>

@@ -1,0 +1,164 @@
+import { useState } from 'react';
+import { ArrowDown, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import type { Chapter } from '../types';
+import type { ReaderSettings } from '../types';
+import type { BookMetadata } from '../hooks/useChapters';
+import SiteHeader from './SiteHeader';
+import SiteFooter from './SiteFooter';
+
+interface HomePageProps {
+  chapters: Chapter[];
+  bookInfo: BookMetadata | null;
+  settings: ReaderSettings;
+  resumeChapterIndex: number;
+  onStartReading: (chapterIndex: number) => void;
+  onOpenSettings: () => void;
+  onOpenCharacters: () => void;
+  onOpenKitchen: () => void;
+  onOpenRecipes: () => void;
+}
+
+function getChapterKicker(label: string) {
+  if (/preface/i.test(label)) return 'Prefácio';
+  if (/afterword/i.test(label)) return 'Posfácio';
+  const number = label.match(/chapter\s+(\d+)/i)?.[1];
+  return number ? `Capítulo ${number.padStart(2, '0')}` : 'Capítulo';
+}
+
+export default function HomePage({ chapters, bookInfo, settings, resumeChapterIndex, onStartReading, onOpenSettings, onOpenCharacters, onOpenKitchen, onOpenRecipes }: HomePageProps) {
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
+  const palette = {
+    light: {
+      page: 'from-ivory-100 via-ivory-50 to-ivory-100',
+      header: 'bg-ivory-50/90 border-ivory-300',
+      surface: 'bg-ivory-50 border-ivory-300 hover:border-burgundy-300',
+      text: 'text-charcoal-900',
+      muted: 'text-charcoal-600',
+      brand: 'text-burgundy-700',
+      accent: 'text-burgundy-600',
+      control: 'border-ivory-300 bg-ivory-100 text-burgundy-700 hover:bg-ivory-200',
+    },
+    sepia: {
+      page: 'from-amber-100 via-amber-50 to-amber-100',
+      header: 'bg-amber-50/90 border-amber-300',
+      surface: 'bg-amber-50 border-amber-300 hover:border-burgundy-300',
+      text: 'text-amber-950',
+      muted: 'text-amber-900/70',
+      brand: 'text-burgundy-700',
+      accent: 'text-burgundy-700',
+      control: 'border-amber-300 bg-amber-100 text-burgundy-700 hover:bg-amber-200',
+    },
+    dark: {
+      page: 'from-charcoal-900 via-charcoal-800 to-charcoal-900',
+      header: 'bg-charcoal-900/90 border-charcoal-700',
+      surface: 'bg-[#393128] border-[#5b4e40] hover:border-[#c9a75f]',
+      text: 'text-ivory-100',
+      muted: 'text-ivory-300',
+      brand: 'text-ivory-100',
+      accent: 'text-gold-200',
+      control: 'border-charcoal-600 bg-charcoal-800 text-ivory-200 hover:bg-charcoal-700',
+    },
+  }[settings.theme];
+  const resumeChapter = chapters[resumeChapterIndex] ?? chapters[0];
+  const chapterDescription = bookInfo?.description || 'Uma cozinha de alta gastronomia, duas mulheres determinadas e uma história que se constrói entre aromas, escolhas e novos começos.';
+  const summaryParagraphs = chapterDescription.split(/\n\s*\n/);
+
+  return (
+    <div className={`min-h-screen bg-gradient-to-br ${palette.page}`}>
+      <SiteHeader
+        title={bookInfo?.title || 'Mise en Place'}
+        theme={settings.theme}
+        activePage="home"
+        brandLabel="Mise en Place, início"
+        onBrandClick={() => document.getElementById('inicio')?.scrollIntoView({ behavior: 'smooth' })}
+        onGoToChapters={() => {
+          const chapterOneIndex = chapters.findIndex((chapter) => /(?:chapter|capítulo)\s+1\b/i.test(chapter.label));
+          onStartReading(chapterOneIndex >= 0 ? chapterOneIndex : 0);
+        }}
+        onOpenCharacters={onOpenCharacters}
+        onOpenKitchen={onOpenKitchen}
+        onOpenRecipes={onOpenRecipes}
+        onOpenSettings={onOpenSettings}
+      />
+
+      <main id="inicio" className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-8 sm:pt-10">
+        <section aria-label="Boas-vindas">
+          <div className="story-hero relative flex min-h-[360px] flex-col justify-between overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-burgundy-800 via-burgundy-700 to-[#68231f] p-6 text-ivory-50 shadow-elegant sm:min-h-[410px] sm:p-9 lg:p-11">
+            <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full border border-ivory-50/15" aria-hidden="true" />
+            <div className="absolute -right-8 -top-12 h-48 w-48 rounded-full border border-ivory-50/15" aria-hidden="true" />
+            <div className="absolute -bottom-20 right-5 h-44 w-44 rounded-full border-[18px] border-ivory-50/10" aria-hidden="true" />
+            <div className="relative">
+              <span className="inline-flex items-center gap-2 rounded-full border border-ivory-50/25 bg-ivory-50/10 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.17em] text-ivory-100">
+                <BookOpen className="h-3.5 w-3.5" /> Romance · cozinha · recomeços
+              </span>
+              <h1 className="mt-6 max-w-xl font-display text-3xl font-semibold leading-[1.08] sm:text-5xl">
+                Uma história que se serve <span className="text-gold-200">aos poucos.</span>
+              </h1>
+              <p className="mt-4 max-w-3xl font-serif leading-relaxed text-ivory-100/90" style={{ fontSize: `${settings.fontSize}px`, lineHeight: 1.55 }}>
+                Lorena encontra na disciplina do Racine sua armadura; Eduarda, afastada da polícia, busca na gastronomia um recomeço.
+              </p>
+              <button
+                type="button"
+                onClick={() => setSummaryExpanded((expanded) => !expanded)}
+                aria-expanded={summaryExpanded}
+                aria-controls="home-full-summary"
+                className="mt-2 inline-flex min-h-8 items-center gap-1 rounded-md text-xs font-semibold text-gold-200 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-200 sm:text-sm"
+              >
+                {summaryExpanded ? 'Fechar sinopse' : 'Ler sinopse completa'}
+                <ChevronDown className={`h-4 w-4 transition-transform ${summaryExpanded ? 'rotate-180' : ''}`} />
+              </button>
+              <div id="home-full-summary" hidden={!summaryExpanded} className="mt-3 max-w-4xl space-y-3 border-l-2 border-gold-200/60 pl-4 font-serif text-ivory-100/90" style={{ fontSize: `${Math.min(settings.fontSize, 18)}px`, lineHeight: 1.6 }}>
+                {summaryParagraphs.map((paragraph) => <p key={paragraph}>{paragraph}</p>)}
+              </div>
+            </div>
+            <div className="relative mt-8 flex flex-wrap items-center gap-3">
+              {resumeChapter && (
+                <button onClick={() => onStartReading(resumeChapterIndex)} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-ivory-50 px-5 py-3 text-sm font-semibold text-burgundy-800 shadow-soft transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-200 sm:w-auto">
+                  <BookOpen className="h-4 w-4" /> {resumeChapterIndex > 0 ? 'Retomar leitura:' : 'Começar leitura:'} {resumeChapter.label}
+                </button>
+              )}
+              <a href="#sumario" className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl border border-ivory-50/35 px-5 py-3 text-sm font-semibold text-ivory-50 transition hover:bg-ivory-50/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-200 sm:w-auto">
+                Explorar capítulos <ArrowDown className="h-4 w-4" />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section id="sumario" className="scroll-mt-24 pt-12 sm:pt-16" aria-labelledby="chapters-title">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3 sm:mb-8">
+            <div>
+              <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${palette.accent}`}>Carte du jour</p>
+              <h2 id="chapters-title" className={`mt-2 font-display text-2xl font-semibold sm:text-3xl ${palette.text}`}>Escolha seu próximo capítulo</h2>
+            </div>
+            <span className={`text-sm font-serif italic ${palette.muted}`}>{chapters.length} partes para saborear</span>
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {chapters.map((chapter, index) => {
+              const isExtra = /preface|afterword/i.test(chapter.label);
+              return (
+                <button
+                  key={chapter.id}
+                  onClick={() => onStartReading(index)}
+                  className={`group flex min-h-[118px] items-center gap-4 rounded-2xl border p-4 text-left shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-elegant focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy-600 sm:p-5 ${palette.surface}`}
+                >
+                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-display text-base font-semibold ${settings.theme === 'dark' ? 'bg-[#493b27] text-[#e8c986]' : isExtra ? 'bg-gold-100 text-gold-800' : 'bg-burgundy-100 text-burgundy-700'}`}>
+                    {isExtra ? '✦' : String(index + 1).padStart(2, '0')}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className={`block truncate font-display font-semibold ${palette.text}`} style={{ fontSize: `${Math.max(14, settings.fontSize - 2)}px` }}>{chapter.label}</span>
+                    <span className={`mt-1 block text-xs font-medium uppercase tracking-wider ${palette.muted}`}>{getChapterKicker(chapter.label)}</span>
+                    <span className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold ${palette.accent}`}>
+                      Abrir capítulo <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      </main>
+      <SiteFooter theme={settings.theme} />
+    </div>
+  );
+}
