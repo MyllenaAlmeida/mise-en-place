@@ -89,7 +89,7 @@ export default function HomePage({ chapters, bookInfo, settings, resumeChapterIn
             <div className="absolute -bottom-20 right-5 h-44 w-44 rounded-full border-[18px] border-ivory-50/10" aria-hidden="true" />
             <div className="relative">
               <span className="inline-flex items-center gap-2 rounded-full border border-ivory-50/25 bg-ivory-50/10 px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.17em] text-ivory-100">
-                <BookOpen className="h-3.5 w-3.5" /> Romance · cozinha · recomeços
+                <BookOpen className="h-3.5 w-3.5" /> Romance · culinária · recomeços
               </span>
               <h1 className="mt-6 max-w-xl font-display text-3xl font-semibold leading-[1.08] sm:text-5xl">
                 Uma história que se serve <span className="text-gold-200">aos poucos.</span>
