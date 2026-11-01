@@ -33,7 +33,7 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
     if (!cloche) return;
 
     const observer = new IntersectionObserver(([entry]) => {
-      setClocheOpen(entry.isIntersecting);
+      setClocheOpen(entry?.isIntersecting ?? false);
     }, { threshold: 0.35 });
 
     observer.observe(cloche);
