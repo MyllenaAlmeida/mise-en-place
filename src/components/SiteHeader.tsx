@@ -1,10 +1,10 @@
-import { ArrowLeft, BookOpen, ChefHat, CookingPot, Settings, UtensilsCrossed, UsersRound } from 'lucide-react';
+import { ArrowLeft, BookOpen, ChefHat, Moon, Sun, UtensilsCrossed, UsersRound } from 'lucide-react';
 import type { ReaderSettings } from '../types';
 
 interface SiteHeaderProps {
   title: string;
   theme: ReaderSettings['theme'];
-  activePage?: 'home' | 'reader' | 'characters' | 'kitchen' | 'recipes';
+  activePage?: 'home' | 'reader' | 'characters' | 'kitchen';
   brandLabel: string;
   onBackHome?: () => void;
   backHomeLabel?: string;
@@ -12,11 +12,10 @@ interface SiteHeaderProps {
   onGoToChapters?: () => void;
   onOpenCharacters?: () => void;
   onOpenKitchen?: () => void;
-  onOpenRecipes?: () => void;
-  onOpenSettings?: () => void;
+  onToggleTheme?: () => void;
 }
 
-export default function SiteHeader({ title, theme, activePage, brandLabel, onBrandClick, onGoToChapters, onOpenCharacters, onBackHome, backHomeLabel, onOpenKitchen, onOpenRecipes, onOpenSettings }: SiteHeaderProps) {
+export default function SiteHeader({ title, theme, activePage, brandLabel, onBrandClick, onGoToChapters, onOpenCharacters, onBackHome, backHomeLabel, onOpenKitchen, onToggleTheme }: SiteHeaderProps) {
   const palette = {
     light: {
       header: 'bg-ivory-50/90 border-ivory-300',
@@ -26,18 +25,18 @@ export default function SiteHeader({ title, theme, activePage, brandLabel, onBra
       active: 'bg-burgundy-50 text-burgundy-800',
     },
     sepia: {
-      header: 'bg-amber-50/90 border-amber-300',
+      header: 'bg-ivory-50/90 border-ivory-300',
       brand: 'text-burgundy-700',
-      muted: 'text-amber-900/70',
-      control: 'text-amber-950 hover:bg-amber-200 hover:text-burgundy-800',
-      active: 'bg-amber-200 text-burgundy-900',
+      muted: 'text-charcoal-600',
+      control: 'text-charcoal-700 hover:bg-ivory-200 hover:text-burgundy-800',
+      active: 'bg-burgundy-50 text-burgundy-800',
     },
     dark: {
       header: 'bg-charcoal-900/90 border-charcoal-700',
       brand: 'text-ivory-100',
       muted: 'text-ivory-300',
       control: 'text-ivory-200 hover:bg-charcoal-700 hover:text-white',
-      active: 'bg-[#493b27] text-[#e8c986]',
+      active: 'bg-[#592227] text-[#f0e5d3]',
     },
   }[theme];
 
@@ -70,13 +69,8 @@ export default function SiteHeader({ title, theme, activePage, brandLabel, onBra
             <ChefHat className="h-4 w-4 shrink-0" />
             <span className="hidden text-sm font-medium md:inline">Espaço interativo</span>
           </button>}
-          {onOpenRecipes && <button onClick={onOpenRecipes} aria-current={activePage === 'recipes' ? 'page' : undefined} className={`flex h-9 w-9 items-center justify-center gap-2 rounded-lg px-2.5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-burgundy-600 sm:w-auto ${activePage === 'recipes' ? palette.active : palette.control}`} aria-label="Abrir receitas" title="Receitas">
-            <CookingPot className="h-[18px] w-[18px] shrink-0" />
-            <span className="hidden text-sm font-medium md:inline">Receitas</span>
-          </button>}
-          {onOpenSettings && <button onClick={onOpenSettings} className={`ml-1 flex h-9 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-burgundy-600 ${palette.control}`} aria-label="Configurações de leitura" title="Configurações de leitura">
-            <Settings className="h-[18px] w-[18px]" />
-            <span className="sr-only">Leitura</span>
+          {onToggleTheme && <button onClick={onToggleTheme} className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-burgundy-600 ${palette.control}`} role="switch" aria-checked={theme === 'dark'} aria-label={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo noturno'} title={theme === 'dark' ? 'Ativar modo claro' : 'Ativar modo noturno'}>
+            {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
           </button>}
         </nav>
       </div>

@@ -4,27 +4,22 @@ import type { Chapter } from '../types';
 import type { ReaderSettings } from '../types';
 import type { BookMetadata } from '../hooks/useChapters';
 import SiteHeader from './SiteHeader';
-import SiteFooter from './SiteFooter';
 
 interface HomePageProps {
   chapters: Chapter[];
   bookInfo: BookMetadata | null;
   settings: ReaderSettings;
   onStartReading: (chapterIndex: number) => void;
-  onOpenSettings: () => void;
   onOpenCharacters: () => void;
   onOpenKitchen: () => void;
-  onOpenRecipes: () => void;
+  onToggleTheme: () => void;
 }
 
-function getChapterKicker(label: string) {
-  if (/preface/i.test(label)) return 'Prefácio';
-  if (/afterword/i.test(label)) return 'Posfácio';
-  const number = label.match(/chapter\s+(\d+)/i)?.[1];
-  return number ? `Capítulo ${number.padStart(2, '0')}` : 'Capítulo';
+function getChapterTitle(label: string) {
+  return label.replace(/^(?:chapter|capítulo)\s+\d+\s*[:.\-–—]\s*/i, '').trim();
 }
 
-export default function HomePage({ chapters, bookInfo, settings, onStartReading, onOpenSettings, onOpenCharacters, onOpenKitchen, onOpenRecipes }: HomePageProps) {
+export default function HomePage({ chapters, bookInfo, settings, onStartReading, onOpenCharacters, onOpenKitchen, onToggleTheme }: HomePageProps) {
   const [summaryExpanded, setSummaryExpanded] = useState(false);
   const [clocheOpen, setClocheOpen] = useState(false);
   const clocheRef = useRef<HTMLDivElement>(null);
@@ -63,7 +58,7 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
     dark: {
       page: 'from-charcoal-900 via-charcoal-800 to-charcoal-900',
       header: 'bg-charcoal-900/90 border-charcoal-700',
-      surface: 'bg-[#393128] border-[#5b4e40] hover:border-[#c9a75f]',
+      surface: 'bg-[#332126] border-[#68434a] hover:border-[#805560]',
       text: 'text-ivory-100',
       muted: 'text-ivory-300',
       brand: 'text-ivory-100',
@@ -88,8 +83,7 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
         }}
         onOpenCharacters={onOpenCharacters}
         onOpenKitchen={onOpenKitchen}
-        onOpenRecipes={onOpenRecipes}
-        onOpenSettings={onOpenSettings}
+        onToggleTheme={onToggleTheme}
       />
 
       <main id="inicio" className="mx-auto max-w-7xl px-4 pb-16 pt-6 sm:px-8 sm:pt-10">
@@ -171,12 +165,11 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
                   onClick={() => onStartReading(index)}
                   className={`group flex min-h-[118px] items-center gap-4 rounded-2xl border p-4 text-left shadow-soft transition duration-200 hover:-translate-y-0.5 hover:shadow-elegant focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy-600 sm:p-5 ${palette.surface}`}
                 >
-                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-display text-base font-semibold ${settings.theme === 'dark' ? 'bg-[#493b27] text-[#e8c986]' : isExtra ? 'bg-gold-100 text-gold-800' : 'bg-burgundy-100 text-burgundy-700'}`}>
+                  <span className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl font-display text-base font-semibold ${settings.theme === 'dark' ? 'bg-[#41252b] text-[#e8c986]' : isExtra ? 'bg-gold-100 text-gold-800' : 'bg-burgundy-100 text-burgundy-700'}`}>
                     {isExtra ? <ChefHat className="h-5 w-5" aria-hidden="true" /> : String(index + 1).padStart(2, '0')}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className={`block truncate font-display font-semibold ${palette.text}`} style={{ fontSize: `${Math.max(14, settings.fontSize - 2)}px` }}>{chapter.label}</span>
-                    <span className={`mt-1 block text-xs font-medium uppercase tracking-wider ${palette.muted}`}>{getChapterKicker(chapter.label)}</span>
+                    <span className={`block truncate font-display font-semibold ${palette.text}`} style={{ fontSize: `${Math.max(14, settings.fontSize - 2)}px` }}>{getChapterTitle(chapter.label)}</span>
                     <span className={`mt-2 inline-flex items-center gap-1 text-xs font-semibold ${palette.accent}`}>
                       Abrir capítulo <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                     </span>
@@ -187,7 +180,6 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
           </div>
         </section>
       </main>
-      <SiteFooter theme={settings.theme} />
     </div>
   );
 }

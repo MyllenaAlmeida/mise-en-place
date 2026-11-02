@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { BookOpen, ChevronLeft, ChevronRight, Clock3, CookingPot, X } from 'lucide-react';
 import type { ReaderSettings } from '../types';
 
 interface ChapterViewerProps {
@@ -11,6 +11,7 @@ interface ChapterViewerProps {
   previousChapterTitle?: string;
   nextChapterTitle?: string;
   settings: ReaderSettings;
+  onFontSizeChange: (fontSize: number) => void;
   onChapterRead: () => void;
   onNext: () => void;
   onPrev: () => void;
@@ -27,6 +28,7 @@ export default function ChapterViewer({
   previousChapterTitle,
   nextChapterTitle,
   settings, 
+  onFontSizeChange,
   onChapterRead,
   onNext, 
   onPrev, 
@@ -71,6 +73,7 @@ export default function ChapterViewer({
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
       
       if (doc) {
+        const previousScrollY = iframe.contentWindow?.scrollY ?? 0;
         doc.open();
         doc.write(content);
         doc.close();
@@ -112,17 +115,17 @@ export default function ChapterViewer({
         // Apply custom styles
         const style = doc.createElement('style');
         style.textContent = `
-          @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,500&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
           
           * {
             box-sizing: border-box;
           }
           
           body {
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-family: 'Lora', Georgia, serif !important;
             font-size: ${settings.fontSize}px !important;
-            font-weight: 500 !important;
-            line-height: 1.8 !important;
+            font-weight: 400 !important;
+            line-height: 1.75 !important;
             max-width: ${sidebarVisible ? 750 : 960}px !important;
             margin: 0 auto !important;
             padding: 40px 20px !important;
@@ -140,7 +143,7 @@ export default function ChapterViewer({
             body {
               font-size: ${Math.max(settings.fontSize, 18)}px !important;
               padding: 28px 18px !important;
-              line-height: 1.85 !important;
+              line-height: 1.75 !important;
             }
           }
           
@@ -159,8 +162,8 @@ export default function ChapterViewer({
             margin-bottom: 1.5em !important;
             text-align: justify !important;
             text-indent: 2em !important;
-            font-weight: 500 !important;
-            line-height: 1.8 !important;
+            font-weight: 400 !important;
+            line-height: 1.75 !important;
           }
           
           p:first-of-type {
@@ -176,10 +179,10 @@ export default function ChapterViewer({
           
           .chapter-title {
             text-align: center !important;
-            font-size: 2.5em !important;
+            font-size: 2.5rem !important;
             margin-bottom: 2.5em !important;
             padding-bottom: 1.5em !important;
-            border-bottom: 3px solid ${settings.theme === 'dark' ? '#80683d' : '#de4f4f'} !important;
+            border-bottom: 3px solid ${settings.theme === 'dark' ? '#805560' : '#de4f4f'} !important;
             font-family: 'Playfair Display', Georgia, serif !important;
             color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
             font-weight: 600 !important;
@@ -187,7 +190,7 @@ export default function ChapterViewer({
 
           @media (max-width: 639px) {
             .chapter-title {
-              font-size: 1.65em !important;
+              font-size: 1.8rem !important;
               line-height: 1.2 !important;
               margin: 0 0 1.35em !important;
               padding-bottom: 0.8em !important;
@@ -196,13 +199,13 @@ export default function ChapterViewer({
             }
 
             p {
-              font-weight: 600 !important;
-              line-height: 1.85 !important;
+              font-weight: 400 !important;
+              line-height: 1.75 !important;
             }
           }
           
           .calibre7, .userstuff1, .userstuff2, .calibre1 {
-            font-family: 'Cormorant Garamond', Georgia, serif !important;
+            font-family: 'Lora', Georgia, serif !important;
           }
           
           .heading {
@@ -217,7 +220,7 @@ export default function ChapterViewer({
           [id^="endnotes"] {
             margin: 4em 0 2em !important;
             padding: 1.5em !important;
-            border: 1px solid ${settings.theme === 'dark' ? '#6b5638' : settings.theme === 'sepia' ? '#d3b98d' : '#d9c4a7'} !important;
+            border: 1px solid ${settings.theme === 'dark' ? '#68434a' : settings.theme === 'sepia' ? '#d3b98d' : '#d9c4a7'} !important;
             border-top: 3px solid ${settings.theme === 'dark' ? '#b58b4a' : '#c6a62e'} !important;
             border-radius: 14px !important;
           }
@@ -227,14 +230,14 @@ export default function ChapterViewer({
           }
 
           [id^="endnotes"] {
-            background: ${settings.theme === 'dark' ? '#3a3129' : settings.theme === 'sepia' ? '#f3eadb' : '#fbf8f2'} !important;
+            background: ${settings.theme === 'dark' ? '#332126' : settings.theme === 'sepia' ? '#f3eadb' : '#fbf8f2'} !important;
           }
 
           .chapter-summary-section > p:first-child,
           [id^="endnotes"] > p:first-child {
             margin: 0 0 1em !important;
             padding: 0 0 0.65em !important;
-            border-bottom: 1px solid ${settings.theme === 'dark' ? '#6b5638' : settings.theme === 'sepia' ? '#d3b98d' : '#d9c4a7'} !important;
+            border-bottom: 1px solid ${settings.theme === 'dark' ? '#68434a' : settings.theme === 'sepia' ? '#d3b98d' : '#d9c4a7'} !important;
             color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
             font-family: 'Playfair Display', Georgia, serif !important;
             font-size: 1.4em !important;
@@ -262,6 +265,7 @@ export default function ChapterViewer({
 
         const readingWindow = doc.defaultView;
         if (readingWindow) {
+          readingWindow.requestAnimationFrame(() => readingWindow.scrollTo(0, previousScrollY));
           let markedAsRead = false;
           let checkFrame = 0;
           const markWhenAtEnd = () => {
@@ -300,14 +304,18 @@ export default function ChapterViewer({
   };
 
   return (
-    <div className={`flex h-full flex-col ${settings.theme === 'dark' ? 'bg-[#352c25]' : settings.theme === 'sepia' ? 'bg-amber-100' : 'bg-ivory-50'}`} onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className={`flex h-full flex-col ${settings.theme === 'dark' ? 'bg-[#211719]' : settings.theme === 'sepia' ? 'bg-amber-100' : 'bg-ivory-50'}`} onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Chapter Content */}
       <div className="flex min-h-0 flex-1 flex-col overflow-auto">
-        <div className={`sticky top-0 z-10 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 border-b px-3 py-2 text-center text-[0.68rem] font-medium shadow-sm backdrop-blur sm:text-xs ${settings.theme === 'dark' ? 'border-[#5b4e40] bg-[#302821]/95 text-[#d8c9b4]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50/95 text-amber-900/80' : 'border-ivory-300 bg-ivory-50/95 text-charcoal-600'}`} role="status" aria-label={`Leitura estimada: ${readingMinutes} minutos; tempo de cocção estimado: ${readingMinutes} minutos`}>
-          <span aria-hidden="true">⏳</span>
-          <span>Leitura: ~{readingMinutes} min</span>
-          <span className="text-charcoal-400" aria-hidden="true">·</span>
-          <span><span aria-hidden="true">🍲 </span>Tempo de cocção: ~{readingMinutes} min</span>
+        <div className={`sticky top-0 z-10 grid grid-cols-1 items-center gap-2 border-b px-3 py-2 text-[0.68rem] font-medium shadow-sm backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:px-5 sm:text-xs ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]/95 text-[#e0cfd1]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50/95 text-amber-900/80' : 'border-ivory-300 bg-ivory-50/95 text-charcoal-600'}`} aria-label="Controles e informações do capítulo">
+          <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center sm:col-start-2" role="status" aria-label={`Leitura estimada: ${readingMinutes} minutos; tempo de cocção estimado: ${readingMinutes} minutos`}>
+            <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Leitura: ~{readingMinutes} min</span>
+            <span className="inline-flex items-center gap-1.5"><CookingPot className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Tempo de cocção: ~{readingMinutes} min</span>
+          </div>
+          <div className="ml-auto inline-flex shrink-0 items-center gap-1 sm:col-start-3 sm:row-start-1" role="group" aria-label="Tamanho do texto">
+            <button type="button" onClick={() => onFontSizeChange(Math.max(12, settings.fontSize - 1))} disabled={settings.fontSize <= 12} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Diminuir tamanho da fonte" title="Diminuir fonte">A−</button>
+            <button type="button" onClick={() => onFontSizeChange(Math.min(24, settings.fontSize + 1))} disabled={settings.fontSize >= 24} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Aumentar tamanho da fonte" title="Aumentar fonte">A+</button>
+          </div>
         </div>
         {isLoading ? (
             <div className="flex min-h-0 flex-1 flex-col items-center justify-center animate-fade-in">
@@ -325,11 +333,11 @@ export default function ChapterViewer({
       </div>
       
       {/* Navigation Controls */}
-      {showNavigation && <div className={`flex items-center gap-2 border-t px-3 py-2 shadow-soft sm:gap-3 sm:px-6 sm:py-2.5 ${settings.theme === 'dark' ? 'border-[#5b4e40] bg-[#302821]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50' : 'border-ivory-300 bg-ivory-50'}`}>
+      {showNavigation && <div className={`flex items-center gap-2 border-t px-3 py-2 shadow-soft sm:gap-3 sm:px-6 sm:py-2.5 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50' : 'border-ivory-300 bg-ivory-50'}`}>
         <button
           onClick={onPrev}
           disabled={!hasPrev}
-          className={`group flex min-h-10 min-w-0 flex-1 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors disabled:cursor-not-allowed sm:min-h-12 sm:gap-2.5 sm:px-4 sm:py-2 ${settings.theme === 'dark' ? 'border-[#5b4e40] bg-[#3a3129] text-[#f0e5d3] hover:bg-[#493e33] disabled:bg-[#3a3129] disabled:text-[#a89985]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50 text-burgundy-800 hover:bg-amber-100 disabled:bg-amber-100 disabled:text-amber-700/50' : 'border-ivory-300 bg-white text-burgundy-800 hover:border-burgundy-300 hover:bg-ivory-100 disabled:bg-ivory-100 disabled:text-charcoal-400'}`}
+          className={`group flex min-h-10 min-w-0 flex-1 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors disabled:cursor-not-allowed sm:min-h-12 sm:gap-2.5 sm:px-4 sm:py-2 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#332126] text-[#f0e5d3] hover:bg-[#41252b] disabled:bg-[#332126] disabled:text-[#a89985]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50 text-burgundy-800 hover:bg-amber-100 disabled:bg-amber-100 disabled:text-amber-700/50' : 'border-ivory-300 bg-white text-burgundy-800 hover:border-burgundy-300 hover:bg-ivory-100 disabled:bg-ivory-100 disabled:text-charcoal-400'}`}
           aria-label={previousChapterTitle ? `Capítulo anterior: ${previousChapterTitle}` : 'Capítulo anterior'}
         >
           <svg className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-x-0.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

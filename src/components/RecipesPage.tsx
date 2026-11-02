@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { BookOpen, ChefHat, ChevronDown, Clock3, CookingPot, Utensils } from 'lucide-react';
 import type { BookMetadata } from '../hooks/useChapters';
 import type { ReaderSettings } from '../types';
-import SiteFooter from './SiteFooter';
 import SiteHeader from './SiteHeader';
 
 type RecipeCategory = 'Entrada' | 'Principal' | 'Sobremesa';
@@ -64,27 +63,18 @@ interface RecipesPageProps {
   onGoToChapters: () => void;
   onOpenCharacters: () => void;
   onOpenKitchen: () => void;
-  onOpenRecipes: () => void;
-  onOpenSettings: () => void;
   onOpenChapter: (chapterId: string) => void;
+  onToggleTheme: () => void;
 }
 
-export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters, onOpenCharacters, onOpenKitchen, onOpenRecipes, onOpenSettings, onOpenChapter }: RecipesPageProps) {
-  const [category, setCategory] = useState<'Todas' | RecipeCategory>('Todas');
-  const [expanded, setExpanded] = useState<string | null>(null);
+export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters, onOpenCharacters, onOpenKitchen, onOpenChapter, onToggleTheme }: RecipesPageProps) {
   const dark = theme === 'dark';
   const sepia = theme === 'sepia';
-  const page = dark ? 'bg-[#2b2520]' : sepia ? 'bg-[#f3e5cc]' : 'bg-[#f6eee3]';
-  const card = dark ? 'border-[#5b4e40] bg-[#393128]' : sepia ? 'border-amber-300 bg-[#f5ead8]' : 'border-[#e4d3bf] bg-[#fbf4eb]';
-  const detail = dark ? 'border-[#6b5638] bg-[#46382d] text-[#f0e5d3]' : sepia ? 'border-amber-300 bg-[#efe0c9] text-amber-950' : 'border-[#ead7c5] bg-[#f3e6da] text-charcoal-800';
-  const title = dark ? 'text-[#f0e5d3]' : sepia ? 'text-amber-950' : 'text-charcoal-900';
-  const muted = dark ? 'text-[#c9baa5]' : sepia ? 'text-amber-900/75' : 'text-charcoal-600';
-  const visibleRecipes = recipes.filter((recipe) => category === 'Todas' || recipe.category === category);
-  const filters: Array<'Todas' | RecipeCategory> = ['Todas', 'Entrada', 'Principal', 'Sobremesa'];
+  const page = dark ? 'bg-[#211719]' : sepia ? 'bg-[#f3e5cc]' : 'bg-[#f6eee3]';
 
   return (
     <div className={`min-h-dvh ${page}`}>
-      <SiteHeader title={bookInfo?.title || 'Mise en Place'} theme={theme} activePage="recipes" brandLabel="Voltar à página inicial" onBrandClick={onGoHome} onBackHome={onGoHome} backHomeLabel="Voltar à home" onGoToChapters={onGoToChapters} onOpenCharacters={onOpenCharacters} onOpenKitchen={onOpenKitchen} onOpenRecipes={onOpenRecipes} onOpenSettings={onOpenSettings} />
+      <SiteHeader title={bookInfo?.title || 'Mise en Place'} theme={theme} activePage="kitchen" brandLabel="Voltar à página inicial" onBrandClick={onGoHome} onBackHome={onGoHome} backHomeLabel="Voltar à home" onGoToChapters={onGoToChapters} onOpenCharacters={onOpenCharacters} onOpenKitchen={onOpenKitchen} onToggleTheme={onToggleTheme} />
       <main className="mx-auto max-w-7xl px-4 pb-12 pt-5 sm:px-8 sm:pb-16 sm:pt-8">
         <section className="story-hero relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-burgundy-800 via-burgundy-700 to-[#68231f] p-6 text-ivory-50 shadow-elegant sm:p-9" aria-labelledby="recipes-title">
           <div className="absolute -right-12 -top-20 h-64 w-64 rounded-full border border-ivory-50/15" aria-hidden="true" />
@@ -99,6 +89,25 @@ export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters,
           </div>
         </section>
 
+        <RecipesCollection theme={theme} onOpenChapter={onOpenChapter} />
+      </main>
+    </div>
+  );
+}
+
+export function RecipesCollection({ theme, onOpenChapter }: { theme: ReaderSettings['theme']; onOpenChapter: (chapterId: string) => void }) {
+  const [category, setCategory] = useState<'Todas' | RecipeCategory>('Todas');
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const dark = theme === 'dark';
+  const sepia = theme === 'sepia';
+  const card = dark ? 'border-[#68434a] bg-[#332126]' : sepia ? 'border-amber-300 bg-[#f5ead8]' : 'border-[#e4d3bf] bg-[#fbf4eb]';
+  const detail = dark ? 'border-[#68434a] bg-[#45272d] text-[#f0e5d3]' : sepia ? 'border-amber-300 bg-[#efe0c9] text-amber-950' : 'border-[#ead7c5] bg-[#f3e6da] text-charcoal-800';
+  const title = dark ? 'text-[#f0e5d3]' : sepia ? 'text-amber-950' : 'text-charcoal-900';
+  const muted = dark ? 'text-[#c9baa5]' : sepia ? 'text-amber-900/75' : 'text-charcoal-600';
+  const visibleRecipes = recipes.filter((recipe) => category === 'Todas' || recipe.category === category);
+  const filters: Array<'Todas' | RecipeCategory> = ['Todas', 'Entrada', 'Principal', 'Sobremesa'];
+
+  return (
         <section className="pt-7 sm:pt-9" aria-label="Receitas">
           <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
             <h2 className={`font-display text-2xl font-semibold ${title}`}>Escolha algo para preparar</h2>
@@ -136,8 +145,5 @@ export default function RecipesPage({ bookInfo, theme, onGoHome, onGoToChapters,
             })}
           </div>
         </section>
-      </main>
-      <SiteFooter theme={theme} />
-    </div>
   );
 }

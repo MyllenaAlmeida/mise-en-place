@@ -82,7 +82,7 @@ export default function VioletaNotebook({ theme }: { theme: ReaderSettings['them
   const pageStyle = 'violeta-aged-paper violeta-ink bg-[#fffaf0]';
 
   return (
-    <section className={`rounded-3xl border p-4 shadow-soft sm:p-6 ${dark ? 'border-[#5b4e40] bg-[#393128]' : theme === 'sepia' ? 'border-amber-300 bg-[#f5ead8]' : 'border-[#e4d3bf] bg-[#fbf4eb]'}`} aria-labelledby="violeta-notebook-heading">
+    <section className={`rounded-3xl border p-4 shadow-soft sm:p-6 ${dark ? 'border-[#68434a] bg-[#332126]' : theme === 'sepia' ? 'border-amber-300 bg-[#f5ead8]' : 'border-[#e4d3bf] bg-[#fbf4eb]'}`} aria-labelledby="violeta-notebook-heading">
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className={`text-xs font-semibold uppercase tracking-[0.16em] ${dark ? 'text-[#e8c986]' : 'text-burgundy-700'}`}>Memórias à mesa</p>
@@ -90,7 +90,7 @@ export default function VioletaNotebook({ theme }: { theme: ReaderSettings['them
           <p className={`mt-1 max-w-2xl text-sm leading-relaxed ${dark ? 'text-[#c9baa5]' : 'text-charcoal-600'}`}>Receitas simples, anotações de mãe e lembranças que Eduarda carrega para a cozinha.</p>
         </div>
         {isOpen && (
-          <button type="button" onClick={() => { setIsOpen(false); setTurn(null); }} className={`inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold ${dark ? 'border-[#80683d] text-[#e8c986] hover:bg-[#493e33]' : 'border-[#d7c1a1] text-burgundy-800 hover:bg-[#f3e6d9]'}`}>
+          <button type="button" onClick={() => { setIsOpen(false); setTurn(null); }} className={`inline-flex min-h-10 items-center gap-2 rounded-xl border px-3 py-2 text-sm font-semibold ${dark ? 'border-[#805560] text-[#e8c986] hover:bg-[#41252b]' : 'border-[#d7c1a1] text-burgundy-800 hover:bg-[#f3e6d9]'}`}>
             <X className="h-4 w-4" /> Fechar caderno
           </button>
         )}

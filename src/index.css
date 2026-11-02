@@ -54,17 +54,17 @@ body {
 
 /* A softer night palette for all non-EPUB surfaces. */
 :root[data-theme='dark'] body {
-  background-color: #2b2520;
+  background-color: #211719;
   color: #f0e5d3;
 }
 
 :root[data-theme='dark'] .min-h-dvh.bg-gradient-to-br {
-  background-image: linear-gradient(135deg, #2b2520 0%, #352c25 52%, #2d2722 100%) !important;
+  background-image: linear-gradient(135deg, #211719 0%, #302025 52%, #261a1d 100%) !important;
 }
 
 :root[data-theme='dark'] .story-hero {
-  border: 1px solid #6b5638;
-  background-image: linear-gradient(125deg, #493e33 0%, #3a3129 55%, #302821 100%) !important;
+  border: 1px solid #68434a;
+  background-image: linear-gradient(125deg, #592227 0%, #43232a 55%, #2f1c21 100%) !important;
   box-shadow: 0 16px 40px rgb(0 0 0 / 24%), inset 0 1px 0 rgb(232 201 134 / 10%);
 }
 
@@ -73,36 +73,36 @@ body {
 :root[data-theme='dark'] .bg-white,
 :root[data-theme='dark'] .bg-amber-50,
 :root[data-theme='dark'] .bg-amber-100 {
-  background-color: #3a3129 !important;
+  background-color: #332126 !important;
 }
 
 :root[data-theme='dark'] .bg-ivory-200,
 :root[data-theme='dark'] .bg-amber-200 {
-  background-color: #493e33 !important;
+  background-color: #41252b !important;
 }
 
 :root[data-theme='dark'] .bg-gold-50,
 :root[data-theme='dark'] .bg-gold-100,
 :root[data-theme='dark'] .bg-gold-200 {
-  background-color: #493b27 !important;
+  background-color: #382329 !important;
 }
 
 /* Keep burgundy controls in the same warm, muted palette at night. */
 :root[data-theme='dark'] .bg-burgundy-50,
 :root[data-theme='dark'] .bg-burgundy-100 {
-  background-color: #493b2b !important;
+  background-color: #41252b !important;
 }
 
 :root[data-theme='dark'] .bg-burgundy-500,
 :root[data-theme='dark'] .bg-burgundy-600,
 :root[data-theme='dark'] .bg-burgundy-700,
 :root[data-theme='dark'] .bg-burgundy-800 {
-  background-color: #493e33 !important;
+  background-color: #592227 !important;
 }
 
 :root[data-theme='dark'] .bg-gradient-to-r.from-burgundy-600,
 :root[data-theme='dark'] .bg-gradient-to-br.from-burgundy-50 {
-  background-image: linear-gradient(125deg, #493e33 0%, #3a3129 58%, #302821 100%) !important;
+  background-image: linear-gradient(125deg, #592227 0%, #43232a 58%, #2f1c21 100%) !important;
 }
 
 :root[data-theme='dark'] .border-burgundy-200,
@@ -111,13 +111,13 @@ body {
 :root[data-theme='dark'] .border-burgundy-600,
 :root[data-theme='dark'] .border-burgundy-700,
 :root[data-theme='dark'] .border-burgundy-800 {
-  border-color: #8b7045 !important;
+  border-color: #805560 !important;
 }
 
 :root[data-theme='dark'] .hover\:bg-burgundy-50:hover,
 :root[data-theme='dark'] .hover\:bg-burgundy-500:hover,
 :root[data-theme='dark'] .hover\:bg-burgundy-800:hover {
-  background-color: #574737 !important;
+  background-color: #67303a !important;
 }
 
 :root[data-theme='dark'] .hover\:border-burgundy-200:hover,
@@ -175,50 +175,50 @@ body {
 :root[data-theme='dark'] .border-ivory-200,
 :root[data-theme='dark'] .border-amber-300,
 :root[data-theme='dark'] .border-gold-200 {
-  border-color: #5b4e40 !important;
+  border-color: #68434a !important;
 }
 
 :root[data-theme='dark'] header.sticky {
-  border-color: #574a3d !important;
-  background-color: rgb(52 43 35 / 96%) !important;
+  border-color: #68434a !important;
+  background-color: rgb(47 28 33 / 96%) !important;
 }
 
 :root[data-theme='dark'] aside.bg-gradient-to-b.from-ivory-50 {
-  background-image: linear-gradient(180deg, #3a3028 0%, #2e2721 100%) !important;
+  background-image: linear-gradient(180deg, #332126 0%, #261a1d 100%) !important;
 }
 
 :root[data-theme='dark'] .max-w-lg.bg-gradient-to-br {
-  background-image: linear-gradient(135deg, #3a3129, #302821) !important;
+  background-image: linear-gradient(135deg, #332126, #2a1b1f) !important;
 }
 
 :root[data-theme='dark'] button.border-burgundy-600.bg-gradient-to-br {
-  border-color: #c9a75f !important;
-  background-image: linear-gradient(135deg, #493b2b, #3d3227) !important;
+  border-color: #805560 !important;
+  background-image: linear-gradient(135deg, #41252b, #352126) !important;
   box-shadow: 0 8px 24px rgb(0 0 0 / 22%), 0 0 0 1px rgb(201 167 95 / 14%);
 }
 
 :root[data-theme='dark'] .bg-gradient-to-r.from-ivory-50 {
-  background-image: linear-gradient(90deg, #3a3129, #342b24) !important;
+  background-image: linear-gradient(90deg, #332126, #302025) !important;
 }
 
 :root[data-theme='dark'] .mise-finale {
-  border-color: #8b7045;
-  background-image: linear-gradient(135deg, #493e33 0%, #3a3129 58%, #302821 100%) !important;
+  border-color: #805560;
+  background-image: linear-gradient(135deg, #592227 0%, #43232a 58%, #2f1c21 100%) !important;
   color: #f0e5d3;
 }
 
 :root[data-theme='dark'] .mise-finale-item {
-  border-color: #80683d;
-  background-color: #493b2b;
+  border-color: #805560;
+  background-color: #41252b;
   color: #f0e5d3;
 }
 
 :root[data-theme='dark'] ::-webkit-scrollbar-track {
-  background: #2b2520;
+  background: #211719;
 }
 
 :root[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  border-color: #2b2520;
+  border-color: #211719;
   background: linear-gradient(180deg, #8a6a3c 0%, #684c30 100%);
 }
 

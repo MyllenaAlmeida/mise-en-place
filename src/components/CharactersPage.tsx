@@ -3,7 +3,6 @@ import { ChevronDown, Utensils } from 'lucide-react';
 import type { ReaderSettings } from '../types';
 import type { BookMetadata } from '../hooks/useChapters';
 import SiteHeader from './SiteHeader';
-import SiteFooter from './SiteFooter';
 
 type Character = {
   name: string;
@@ -121,27 +120,26 @@ interface CharactersPageProps {
   onGoToChapters: () => void;
   onOpenCharacters: () => void;
   onOpenKitchen: () => void;
-  onOpenRecipes: () => void;
-  onOpenSettings: () => void;
+  onToggleTheme: () => void;
 }
 
-export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToChapters, onOpenCharacters, onOpenKitchen, onOpenRecipes, onOpenSettings }: CharactersPageProps) {
+export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToChapters, onOpenCharacters, onOpenKitchen, onToggleTheme }: CharactersPageProps) {
   const [filter, setFilter] = useState<Filter>('all');
   const [expandedCharacter, setExpandedCharacter] = useState<string | null>(null);
   const visibleCharacters = characters.filter((character) => filter === 'all' || character.groups.includes(filter));
   const characterCardSurface = settings.theme === 'dark'
-    ? 'border-[#5b4e40] bg-[#393128]'
+    ? 'border-[#68434a] bg-[#332126]'
     : settings.theme === 'sepia'
       ? 'border-amber-300 bg-[#f5ead8]'
       : 'border-ivory-300 bg-[#fbf4eb]';
   const characterDetailSurface = settings.theme === 'dark'
-    ? 'border-[#6b5638] bg-[#46382d] text-[#f0e5d3]'
+    ? 'border-[#68434a] bg-[#45272d] text-[#f0e5d3]'
     : settings.theme === 'sepia'
       ? 'border-amber-300 bg-[#efe0c9] text-amber-950'
       : 'border-[#ead7c5] bg-[#f3e6da] text-charcoal-800';
-  const pageSurface = settings.theme === 'dark' ? 'bg-[#2b2520]' : settings.theme === 'sepia' ? 'bg-[#f3e5cc]' : 'bg-[#f6eee3]';
+  const pageSurface = settings.theme === 'dark' ? 'bg-[#211719]' : settings.theme === 'sepia' ? 'bg-[#f3e5cc]' : 'bg-[#f6eee3]';
   const filterSurface = settings.theme === 'dark'
-    ? 'border-[#5b4e40] bg-[#393128] text-[#f0e5d3] hover:bg-[#493e33]'
+    ? 'border-[#68434a] bg-[#332126] text-[#f0e5d3] hover:bg-[#41252b]'
     : settings.theme === 'sepia'
       ? 'border-amber-300 bg-[#f5ead8] text-amber-950 hover:bg-[#efe0c9]'
       : 'border-[#e4d3bf] bg-[#fbf4eb] text-[#5d4b38] hover:bg-[#f3e6da]';
@@ -166,8 +164,7 @@ export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToCha
         onGoToChapters={onGoToChapters}
         onOpenCharacters={onOpenCharacters}
         onOpenKitchen={onOpenKitchen}
-        onOpenRecipes={onOpenRecipes}
-        onOpenSettings={onOpenSettings}
+        onToggleTheme={onToggleTheme}
       />
 
       <main className="mx-auto max-w-7xl px-4 pb-12 pt-5 sm:px-8 sm:pb-16 sm:pt-8">
@@ -231,7 +228,6 @@ export default function CharactersPage({ bookInfo, settings, onGoHome, onGoToCha
           </div>
         </section>
       </main>
-      <SiteFooter theme={settings.theme} />
     </div>
   );
 }

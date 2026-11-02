@@ -5,24 +5,19 @@ import { useTheme } from './hooks/useTheme';
 import type { ReaderSettings } from './types';
 import Sidebar, { type AppPage } from './components/Sidebar';
 import ChapterViewer from './components/ChapterViewer';
-import SettingsPanel from './components/SettingsPanel';
 import HomePage from './components/HomePage';
 import KitchenPage from './components/KitchenPage';
 import SiteHeader from './components/SiteHeader';
 import CharactersPage from './components/CharactersPage';
-import RecipesPage from './components/RecipesPage';
-import SiteFooter from './components/SiteFooter';
 
 function App() {
   const [isReading, setIsReading] = useState(false);
   const [isKitchenOpen, setIsKitchenOpen] = useState(false);
   const [isCharactersOpen, setIsCharactersOpen] = useState(false);
-  const [isRecipesOpen, setIsRecipesOpen] = useState(false);
   const [returnToReaderAfterKitchen, setReturnToReaderAfterKitchen] = useState(false);
   const [returnToReaderAfterCharacters, setReturnToReaderAfterCharacters] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [readerSidebarVisible, setReaderSidebarVisible] = useState(true);
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [mobileChapterSidebarOpen, setMobileChapterSidebarOpen] = useState(false);
   const [progressReady, setProgressReady] = useState(false);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(() => {
     const saved = localStorage.getItem('miseEnPlaceProgress');
@@ -44,8 +39,13 @@ function App() {
   
   const [settings, setSettings] = useLocalStorage<ReaderSettings>('readerSettings', {
     fontSize: 18,
-    theme: 'sepia',
+    theme: 'light',
   });
+
+  const toggleTheme = () => setSettings((current) => ({
+    ...current,
+    theme: current.theme === 'dark' ? 'light' : 'dark',
+  }));
 
   const { chapters, bookInfo, isLoading: chaptersLoading } = useChapters();
 
@@ -60,6 +60,10 @@ function App() {
 
   // Sync theme with settings
   useEffect(() => {
+    if (settings.theme === 'sepia') {
+      setSettings((current) => ({ ...current, theme: 'light' }));
+      return;
+    }
     changeTheme(settings.theme);
   }, [settings.theme, changeTheme]);
 
@@ -104,23 +108,22 @@ function App() {
   };
 
   const handleChapterSelect = (href: string) => {
+    setMobileChapterSidebarOpen(false);
     const index = chapters.findIndex(ch => ch.href === href);
     if (index !== -1) {
       setCurrentChapterIndex(index);
       setIsKitchenOpen(false);
       setIsCharactersOpen(false);
-      setIsRecipesOpen(false);
       setIsReading(true);
     }
   };
 
   const navigateToPage = (page: AppPage) => {
-    setSidebarOpen(false);
+    setMobileChapterSidebarOpen(false);
     if (page === 'home') {
       setIsReading(false);
       setIsKitchenOpen(false);
       setIsCharactersOpen(false);
-      setIsRecipesOpen(false);
       setReturnToReaderAfterKitchen(false);
       setReturnToReaderAfterCharacters(false);
       return;
@@ -129,7 +132,6 @@ function App() {
       setIsReading(true);
       setIsKitchenOpen(false);
       setIsCharactersOpen(false);
-      setIsRecipesOpen(false);
       setReturnToReaderAfterKitchen(false);
       setReturnToReaderAfterCharacters(false);
       return;
@@ -139,7 +141,6 @@ function App() {
     setIsReading(false);
     setIsKitchenOpen(page === 'kitchen');
     setIsCharactersOpen(page === 'characters');
-    setIsRecipesOpen(page === 'recipes');
     setReturnToReaderAfterKitchen(page === 'kitchen' && returnToReader);
     setReturnToReaderAfterCharacters(page === 'characters' && returnToReader);
   };
@@ -157,14 +158,13 @@ function App() {
       readChapterIds={readChapterIds}
       activePage={activePage}
       theme={settings.theme}
-      onNavigate={navigateToPage}
       onChapterSelect={handleChapterSelect}
-      isOpen={sidebarOpen}
       showOnDesktop={activePage === 'reader'}
       desktopVisible={activePage === 'reader' && readerSidebarVisible}
+      mobileOpen={mobileChapterSidebarOpen}
       onToggleDesktop={() => setReaderSidebarVisible((visible) => !visible)}
-      onOpen={() => setSidebarOpen(true)}
-      onClose={() => setSidebarOpen(false)}
+      onOpenMobile={() => setMobileChapterSidebarOpen(true)}
+      onCloseMobile={() => setMobileChapterSidebarOpen(false)}
     />
   );
 
@@ -172,11 +172,9 @@ function App() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setSettingsOpen(false);
-        setSidebarOpen(false);
+        setMobileChapterSidebarOpen(false);
         setIsKitchenOpen(false);
         setIsCharactersOpen(false);
-        setIsRecipesOpen(false);
       }
     };
 
@@ -216,18 +214,15 @@ function App() {
                 onGoToChapters={goToChapters}
                 onOpenCharacters={() => navigateToPage('characters')}
                 onOpenKitchen={() => navigateToPage('kitchen')}
-                onOpenRecipes={() => navigateToPage('recipes')}
-                onOpenSettings={() => setSettingsOpen(true)}
+                onToggleTheme={toggleTheme}
+                onOpenChapter={(chapterId) => {
+                  const chapterPosition = chapters.findIndex((chapter) => chapter.id === chapterId);
+                  if (chapterPosition >= 0) setCurrentChapterIndex(chapterPosition);
+                  navigateToPage('reader');
+                }}
               />
             </div>
           </div>
-          {settingsOpen && (
-            <SettingsPanel
-              settings={settings}
-              onSettingsChange={setSettings}
-              onClose={() => setSettingsOpen(false)}
-            />
-          )}
         </>
       );
     }
@@ -245,44 +240,10 @@ function App() {
                 onGoToChapters={goToChapters}
                 onOpenCharacters={() => navigateToPage('characters')}
                 onOpenKitchen={() => navigateToPage('kitchen')}
-              onOpenRecipes={() => navigateToPage('recipes')}
-                onOpenSettings={() => setSettingsOpen(true)}
+                onToggleTheme={toggleTheme}
               />
             </div>
           </div>
-          {settingsOpen && (
-            <SettingsPanel settings={settings} onSettingsChange={setSettings} onClose={() => setSettingsOpen(false)} />
-          )}
-        </>
-      );
-    }
-
-    if (isRecipesOpen) {
-      return (
-        <>
-          <div className="flex h-dvh overflow-hidden">
-            {renderSidebar('recipes')}
-            <div className="h-full min-w-0 flex-1 overflow-y-auto">
-              <RecipesPage
-                bookInfo={bookInfo}
-                theme={settings.theme}
-                onGoHome={() => navigateToPage('home')}
-                onGoToChapters={goToChapters}
-                onOpenCharacters={() => navigateToPage('characters')}
-                onOpenKitchen={() => navigateToPage('kitchen')}
-                onOpenRecipes={() => navigateToPage('recipes')}
-                onOpenSettings={() => setSettingsOpen(true)}
-                onOpenChapter={(chapterIndex) => {
-                  const chapterPosition = chapters.findIndex((chapter) => chapter.id === chapterIndex);
-                  if (chapterPosition >= 0) setCurrentChapterIndex(chapterPosition);
-                  navigateToPage('reader');
-                }}
-              />
-            </div>
-          </div>
-          {settingsOpen && (
-            <SettingsPanel settings={settings} onSettingsChange={setSettings} onClose={() => setSettingsOpen(false)} />
-          )}
         </>
       );
     }
@@ -300,7 +261,7 @@ function App() {
                 setCurrentChapterIndex(chapterIndex);
                 setIsReading(true);
               }}
-              onOpenSettings={() => setSettingsOpen(true)}
+              onToggleTheme={toggleTheme}
               onOpenCharacters={() => {
                 setReturnToReaderAfterCharacters(false);
                 setIsCharactersOpen(true);
@@ -309,17 +270,9 @@ function App() {
                 setReturnToReaderAfterKitchen(false);
                 setIsKitchenOpen(true);
               }}
-                onOpenRecipes={() => navigateToPage('recipes')}
             />
           </div>
         </div>
-        {settingsOpen && (
-          <SettingsPanel
-            settings={settings}
-            onSettingsChange={setSettings}
-            onClose={() => setSettingsOpen(false)}
-          />
-        )}
       </>
     );
   }
@@ -341,17 +294,16 @@ function App() {
           setIsReading(false);
           setIsKitchenOpen(true);
         }}
-        onOpenRecipes={() => navigateToPage('recipes')}
         onOpenCharacters={() => {
           setReturnToReaderAfterCharacters(true);
           setIsReading(false);
           setIsCharactersOpen(true);
         }}
-        onOpenSettings={() => setSettingsOpen(true)}
+        onToggleTheme={toggleTheme}
       />
 
       {/* Progress Bar */}
-      <div className={`h-1.5 shadow-inner ${settings.theme === 'dark' ? 'bg-[#493e33]' : settings.theme === 'sepia' ? 'bg-amber-200' : 'bg-ivory-200'}`}>
+      <div className={`h-1.5 shadow-inner ${settings.theme === 'dark' ? 'bg-[#592227]' : settings.theme === 'sepia' ? 'bg-amber-200' : 'bg-ivory-200'}`}>
         <div
           className={`h-full transition-all duration-500 ease-out shadow-glow ${settings.theme === 'dark' ? 'bg-gradient-to-r from-gold-700 to-gold-500' : 'bg-gradient-to-r from-burgundy-600 to-burgundy-700'}`}
           style={{ width: `${((currentChapterIndex + 1) / chapters.length) * 100}%` }}
@@ -377,6 +329,7 @@ function App() {
               previousChapterTitle={chapters[currentChapterIndex - 1]?.label}
               nextChapterTitle={chapters[currentChapterIndex + 1]?.label}
               settings={settings}
+              onFontSizeChange={(fontSize) => setSettings((current) => ({ ...current, fontSize }))}
               onChapterRead={() => markChapterAsRead(currentChapter.id)}
               onNext={handleNextChapter}
               onPrev={handlePrevChapter}
@@ -387,16 +340,6 @@ function App() {
         </main>
       </div>
 
-      <SiteFooter theme={settings.theme} />
-
-      {/* Settings Panel */}
-      {settingsOpen && (
-        <SettingsPanel
-          settings={settings}
-          onSettingsChange={setSettings}
-          onClose={() => setSettingsOpen(false)}
-        />
-      )}
     </div>
   );
 }
