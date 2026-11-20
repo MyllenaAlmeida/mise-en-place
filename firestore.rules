@@ -1,0 +1,51 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{path=**}/comments/{commentId} {
+      allow list: if resource.data.status == 'visible';
+    }
+
+    match /chapters/{chapterId}/comments/{commentId} {
+      allow read: if resource.data.status == 'visible';
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'body', 'createdAt', 'status', 'chapterId'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.chapterId == chapterId
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() > 0
+        && request.resource.data.authorName.size() <= 40
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 2000
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'visible';
+
+      allow delete: if request.auth != null
+        && resource.data.authorUid == request.auth.uid;
+      allow update: if false;
+    }
+
+    match /chapters/{chapterId}/paragraphs/{paragraphId}/comments/{commentId} {
+      allow read: if resource.data.status == 'visible';
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['authorUid', 'authorName', 'body', 'createdAt', 'status', 'chapterId', 'paragraphId'])
+        && request.resource.data.authorUid == request.auth.uid
+        && request.resource.data.chapterId == chapterId
+        && request.resource.data.paragraphId == paragraphId
+        && request.resource.data.authorName is string
+        && request.resource.data.authorName.size() > 0
+        && request.resource.data.authorName.size() <= 40
+        && request.resource.data.body is string
+        && request.resource.data.body.size() > 0
+        && request.resource.data.body.size() <= 2000
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.status == 'visible';
+
+      allow delete: if request.auth != null
+        && resource.data.authorUid == request.auth.uid;
+      allow update: if false;
+    }
+  }
+}

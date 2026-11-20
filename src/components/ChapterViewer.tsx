@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { BookOpen, ChevronLeft, ChevronRight, Clock3, CookingPot, X } from 'lucide-react';
+import { ArrowUp, BookOpen, ChevronLeft, ChevronRight, Clock3, CookingPot, MessageCircle, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import type { ReaderSettings } from '../types';
+import ChapterComments from './ChapterComments';
 
 interface ChapterViewerProps {
+  chapterId: string;
   chapterUrl: string;
   showNavigation: boolean;
   sidebarVisible: boolean;
@@ -20,6 +23,7 @@ interface ChapterViewerProps {
 }
 
 export default function ChapterViewer({ 
+  chapterId,
   chapterUrl, 
   showNavigation,
   sidebarVisible,
@@ -38,7 +42,9 @@ export default function ChapterViewer({
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [floatingNavigationOpen, setFloatingNavigationOpen] = useState(false);
+  const [hasReachedChapterEnd, setHasReachedChapterEnd] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [commentsMount, setCommentsMount] = useState<HTMLElement | null>(null);
   const onChapterReadRef = useRef(onChapterRead);
   onChapterReadRef.current = onChapterRead;
   const readingMinutes = useMemo(() => {
@@ -55,7 +61,16 @@ export default function ChapterViewer({
       try {
         const response = await fetch(chapterUrl);
         const html = await response.text();
-        setContent(html);
+        const chapterDocument = new DOMParser().parseFromString(html, 'text/html');
+        chapterDocument.querySelectorAll('script').forEach((script) => script.remove());
+        chapterDocument.querySelectorAll<HTMLElement>('*').forEach((element) => {
+          Array.from(element.attributes).forEach((attribute) => {
+            if (/^on/i.test(attribute.name) || (/^(href|src|xlink:href)$/i.test(attribute.name) && /^\s*javascript:/i.test(attribute.value))) {
+              element.removeAttribute(attribute.name);
+            }
+          });
+        });
+        setContent(`<!DOCTYPE html>${chapterDocument.documentElement.outerHTML}`);
       } catch (error) {
         console.error('Error loading chapter:', error);
       } finally {
@@ -74,6 +89,7 @@ export default function ChapterViewer({
       
       if (doc) {
         const previousScrollY = iframe.contentWindow?.scrollY ?? 0;
+        setCommentsMount(null);
         doc.open();
         doc.write(content);
         doc.close();
@@ -110,6 +126,10 @@ export default function ChapterViewer({
           if (heading?.textContent?.trim().toLowerCase() === 'chapter end notes') {
             heading.textContent = 'Notas finais do capítulo';
           }
+        });
+
+        document.head.querySelectorAll('style, link[rel="stylesheet"]').forEach((asset) => {
+          doc.head.appendChild(asset.cloneNode(true));
         });
 
         // Apply custom styles
@@ -176,6 +196,58 @@ export default function ChapterViewer({
             letter-spacing: 0.35em !important;
             margin: 2.5em 0 !important;
           }
+
+          .chat-message {
+            display: flex !important;
+            flex-direction: column !important;
+            width: min(88%, 36rem) !important;
+            margin: 1.2em 0 !important;
+            text-indent: 0 !important;
+          }
+
+          .chat-message--incoming {
+            margin-right: auto !important;
+            align-items: flex-start !important;
+          }
+
+          .chat-message--outgoing {
+            margin-left: auto !important;
+            align-items: flex-end !important;
+          }
+
+          p.chat-sender {
+            margin: 0 0 0.25em !important;
+            padding: 0 0.7em !important;
+            color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
+            font-family: 'Inter', sans-serif !important;
+            font-size: 0.72em !important;
+            font-weight: 700 !important;
+            text-align: left !important;
+            text-indent: 0 !important;
+          }
+
+          p.chat-bubble {
+            width: fit-content !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0.75em 1em !important;
+            border-radius: 1.15em !important;
+            text-align: left !important;
+            text-indent: 0 !important;
+            overflow-wrap: anywhere !important;
+          }
+
+          .chat-message--incoming p.chat-bubble {
+            border-top-left-radius: 0.35em !important;
+            background: ${settings.theme === 'dark' ? '#382b2e' : '#f0e9df'} !important;
+            color: ${settings.theme === 'dark' ? '#f0e5d3' : '#45372a'} !important;
+          }
+
+          .chat-message--outgoing p.chat-bubble {
+            border-top-right-radius: 0.35em !important;
+            background: ${settings.theme === 'dark' ? '#3b493f' : '#e4eee3'} !important;
+            color: ${settings.theme === 'dark' ? '#f0e5d3' : '#334536'} !important;
+          }
           
           .chapter-title {
             text-align: center !important;
@@ -233,6 +305,15 @@ export default function ChapterViewer({
             background: ${settings.theme === 'dark' ? '#332126' : settings.theme === 'sepia' ? '#f3eadb' : '#fbf8f2'} !important;
           }
 
+          #chapter-comments-mount {
+            max-width: ${sidebarVisible ? 830 : 1040}px;
+            margin: 0 auto;
+            padding: 0 20px 48px;
+            color: ${settings.theme === 'dark' ? '#f0e5d3' : settings.theme === 'sepia' ? '#78350f' : '#45372a'};
+            font-family: Inter, Arial, sans-serif;
+            text-align: left;
+          }
+
           .chapter-summary-section > p:first-child,
           [id^="endnotes"] > p:first-child {
             margin: 0 0 1em !important;
@@ -263,6 +344,12 @@ export default function ChapterViewer({
         `;
         doc.head.appendChild(style);
 
+        const chapterTextEnd = doc.body.scrollHeight;
+        const commentsContainer = doc.createElement('div');
+        commentsContainer.id = 'chapter-comments-mount';
+        doc.body.appendChild(commentsContainer);
+        setCommentsMount(commentsContainer);
+
         const readingWindow = doc.defaultView;
         if (readingWindow) {
           readingWindow.requestAnimationFrame(() => readingWindow.scrollTo(0, previousScrollY));
@@ -270,8 +357,8 @@ export default function ChapterViewer({
           let checkFrame = 0;
           const markWhenAtEnd = () => {
             if (markedAsRead) return;
-            const scrollRoot = doc.scrollingElement || doc.documentElement;
-            if (readingWindow.scrollY + readingWindow.innerHeight >= scrollRoot.scrollHeight - 96) {
+            if (readingWindow.scrollY + readingWindow.innerHeight >= chapterTextEnd - 96) {
+              setHasReachedChapterEnd(true);
               markedAsRead = true;
               onChapterReadRef.current();
             }
@@ -287,13 +374,17 @@ export default function ChapterViewer({
       }
     }
     return () => cleanupReadTracking?.();
-  }, [content, settings]);
+  }, [content, settings, chapterId]);
 
   useEffect(() => {
     setFloatingNavigationOpen(false);
+    setHasReachedChapterEnd(false);
   }, [chapterUrl, showNavigation]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (target?.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'A'].includes(target?.tagName ?? '')) return;
+
     if (e.key === 'ArrowRight' || e.key === ' ') {
       e.preventDefault();
       if (hasNext) onNext();
@@ -306,12 +397,13 @@ export default function ChapterViewer({
   return (
     <div className={`flex h-full flex-col ${settings.theme === 'dark' ? 'bg-[#211719]' : settings.theme === 'sepia' ? 'bg-amber-100' : 'bg-ivory-50'}`} onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Chapter Content */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         <div className={`sticky top-0 z-10 grid grid-cols-1 items-center gap-2 border-b px-3 py-2 text-[0.68rem] font-medium shadow-sm backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:px-5 sm:text-xs ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]/95 text-[#e0cfd1]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50/95 text-amber-900/80' : 'border-ivory-300 bg-ivory-50/95 text-charcoal-600'}`} aria-label="Controles e informações do capítulo">
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center sm:col-start-2" role="status" aria-label={`Leitura estimada: ${readingMinutes} minutos; tempo de cocção estimado: ${readingMinutes} minutos`}>
             <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Leitura: ~{readingMinutes} min</span>
             <span className="inline-flex items-center gap-1.5"><CookingPot className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Tempo de cocção: ~{readingMinutes} min</span>
           </div>
+          <button type="button" onClick={() => iframeRef.current?.contentWindow?.document.getElementById('chapter-comments-mount')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="col-span-full inline-flex items-center justify-center gap-1.5 text-[0.65rem] opacity-70 transition hover:opacity-100 sm:col-start-1 sm:col-span-1 sm:row-start-1 sm:justify-start sm:text-[0.68rem]" aria-label="Ir para os comentários no final do capítulo"><MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /><span>Ir para os comentários</span></button>
           <div className="ml-auto inline-flex shrink-0 items-center gap-1 sm:col-start-3 sm:row-start-1" role="group" aria-label="Tamanho do texto">
             <button type="button" onClick={() => onFontSizeChange(Math.max(12, settings.fontSize - 1))} disabled={settings.fontSize <= 12} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Diminuir tamanho da fonte" title="Diminuir fonte">A−</button>
             <button type="button" onClick={() => onFontSizeChange(Math.min(24, settings.fontSize + 1))} disabled={settings.fontSize >= 24} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Aumentar tamanho da fonte" title="Aumentar fonte">A+</button>
@@ -333,7 +425,7 @@ export default function ChapterViewer({
       </div>
       
       {/* Navigation Controls */}
-      {showNavigation && <div className={`flex items-center gap-2 border-t px-3 py-2 shadow-soft sm:gap-3 sm:px-6 sm:py-2.5 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50' : 'border-ivory-300 bg-ivory-50'}`}>
+      {showNavigation && <div className={`${hasReachedChapterEnd ? 'flex' : 'hidden sm:flex'} items-center gap-2 border-t px-3 py-2 shadow-soft sm:gap-3 sm:px-6 sm:py-2.5 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50' : 'border-ivory-300 bg-ivory-50'}`}>
         <button
           onClick={onPrev}
           disabled={!hasPrev}
@@ -404,6 +496,15 @@ export default function ChapterViewer({
             <span>Capítulo {chapterIndex + 1}/{chapterCount}</span>
           </button>
         </div>
+      )}
+      {commentsMount && createPortal(
+        <>
+          <div className="mx-auto mb-10 flex w-full max-w-3xl justify-end px-4 sm:px-5">
+            <button type="button" onClick={() => iframeRef.current?.contentWindow?.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</button>
+          </div>
+          <ChapterComments chapterId={chapterId} chapterNumber={chapterIndex + 1} theme={settings.theme} layout="section" />
+        </>,
+        commentsMount,
       )}
     </div>
   );

@@ -321,6 +321,7 @@ function App() {
         <main className="flex min-h-0 min-w-0 flex-1 flex-col">
           {currentChapter && (
             <ChapterViewer
+              chapterId={currentChapter.id}
               chapterUrl={currentChapter.href}
               showNavigation={readerSidebarVisible}
               sidebarVisible={readerSidebarVisible}
