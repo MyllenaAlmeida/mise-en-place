@@ -41,6 +41,7 @@ Um leitor de e-books elegante e confortável em React, projetado especificamente
 - ✅ Interface responsiva (mobile-first)
 - ✅ Design totalmente adaptável para desktop e dispositivos móveis
 - ✅ Acessibilidade básica (contrastes, ARIA, navegação por teclado)
+- ✅ Métricas de visitas e páginas com Vercel Web Analytics
 
 ## 📚 Conteúdo
 
@@ -71,6 +72,10 @@ A fanfic "Mise en Place" contém:
 - **Google Fonts** (Merriweather, Playfair Display, Inter)
 
 ## 📦 Instalação
+
+### Vercel Web Analytics
+
+O pacote `@vercel/analytics` já está integrado ao app. No painel da Vercel, abra **Analytics** no projeto e clique em **Enable**. Depois, faça um novo deploy para começar a receber métricas de visitas e páginas.
 
 ### Pré-requisitos
 - Node.js 18+ instalado

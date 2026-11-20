@@ -4,6 +4,7 @@ import type { Chapter } from '../types';
 import type { ReaderSettings } from '../types';
 import type { BookMetadata } from '../hooks/useChapters';
 import SiteHeader from './SiteHeader';
+import SiteFooter from './SiteFooter';
 
 interface HomePageProps {
   chapters: Chapter[];
@@ -180,6 +181,7 @@ export default function HomePage({ chapters, bookInfo, settings, onStartReading,
           </div>
         </section>
       </main>
+      <SiteFooter theme={settings.theme} />
     </div>
   );
 }
