@@ -509,7 +509,7 @@ export default function ChapterViewer({
       )}
       {commentsMount && createPortal(
         <>
-          <div className="mx-auto mb-10 flex w-full max-w-3xl justify-end px-4 sm:px-5">
+          <div className="mx-auto mb-10 flex w-full max-w-3xl justify-center px-4 sm:px-5">
             <a href="#chapter-top" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</a>
           </div>
           <ChapterComments chapterId={chapterId} chapterNumber={chapterIndex + 1} theme={settings.theme} layout="section" />
