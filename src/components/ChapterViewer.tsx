@@ -140,6 +140,10 @@ export default function ChapterViewer({
           * {
             box-sizing: border-box;
           }
+
+          html {
+            scroll-behavior: smooth;
+          }
           
           body {
             font-family: 'Lora', Georgia, serif !important;
@@ -344,6 +348,12 @@ export default function ChapterViewer({
         `;
         doc.head.appendChild(style);
 
+        const chapterTop = doc.createElement('div');
+        chapterTop.id = 'chapter-top';
+        chapterTop.setAttribute('aria-hidden', 'true');
+        chapterTop.style.height = '0';
+        doc.body.prepend(chapterTop);
+
         const chapterTextEnd = doc.body.scrollHeight;
         const commentsContainer = doc.createElement('div');
         commentsContainer.id = 'chapter-comments-mount';
@@ -392,20 +402,6 @@ export default function ChapterViewer({
       e.preventDefault();
       if (hasPrev) onPrev();
     }
-  };
-
-  const scrollChapterToTop = () => {
-    const iframe = iframeRef.current;
-    const doc = iframe?.contentDocument;
-    const readingWindow = iframe?.contentWindow;
-    if (!doc || !readingWindow) return;
-
-    const firstContent = doc.body.firstElementChild as HTMLElement | null;
-    firstContent?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    doc.scrollingElement?.scrollTo({ top: 0, behavior: 'smooth' });
-    doc.documentElement.scrollTop = 0;
-    doc.body.scrollTop = 0;
-    readingWindow.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
@@ -514,7 +510,7 @@ export default function ChapterViewer({
       {commentsMount && createPortal(
         <>
           <div className="mx-auto mb-10 flex w-full max-w-3xl justify-end px-4 sm:px-5">
-            <button type="button" onClick={scrollChapterToTop} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</button>
+            <a href="#chapter-top" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</a>
           </div>
           <ChapterComments chapterId={chapterId} chapterNumber={chapterIndex + 1} theme={settings.theme} layout="section" />
         </>,
