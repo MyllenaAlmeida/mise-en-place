@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { onAuthStateChanged, signInAnonymously, type User } from 'firebase/auth';
 import {
   addDoc,
@@ -41,6 +41,15 @@ function getFirebaseErrorMessage(reason: unknown, fallback: string) {
   if (code === 'failed-precondition') {
     return 'O Firebase precisa do índice atualizado em firestore.indexes.json para carregar os comentários.';
   }
+  if (code === 'auth/operation-not-allowed') {
+    return 'O login anônimo está desativado. Ative-o em Firebase → Authentication → Sign-in method.';
+  }
+  if (code === 'auth/unauthorized-domain') {
+    return 'Este domínio ainda não está autorizado no Firebase Authentication.';
+  }
+  if (code === 'auth/network-request-failed') {
+    return 'Não foi possível conectar ao Firebase. Confira sua conexão e tente novamente.';
+  }
   return reason instanceof Error ? reason.message : fallback;
 }
 
@@ -53,18 +62,38 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
   const [sending, setSending] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [error, setError] = useState('');
+  const pendingAuthRef = useRef<Promise<User> | null>(null);
   const dark = theme === 'dark';
   const panelLayout = layout === 'panel';
   const panel = dark ? 'border-[#68434a] bg-[#2a1b1f] text-[#f0e5d3]' : theme === 'sepia' ? 'border-amber-300 bg-amber-50 text-amber-950' : 'border-ivory-300 bg-white text-charcoal-800';
   const field = dark ? 'border-[#68434a] bg-[#211719] text-[#f0e5d3] placeholder:text-[#bba9a6]' : 'border-ivory-300 bg-white text-charcoal-800 placeholder:text-charcoal-400';
 
+  const ensureAnonymousUser = () => {
+    if (!firebaseAuth) return Promise.reject(new Error('Firebase Authentication não está configurado.'));
+    if (firebaseAuth.currentUser) {
+      setUser(firebaseAuth.currentUser);
+      return Promise.resolve(firebaseAuth.currentUser);
+    }
+    if (!pendingAuthRef.current) {
+      pendingAuthRef.current = signInAnonymously(firebaseAuth)
+        .then((credential) => credential.user)
+        .finally(() => { pendingAuthRef.current = null; });
+    }
+    return pendingAuthRef.current.then((currentUser) => {
+      setUser(currentUser);
+      return currentUser;
+    });
+  };
+
   useEffect(() => {
     const auth = firebaseAuth;
     if (!auth) return;
     return onAuthStateChanged(auth, (currentUser) => {
-      if (currentUser) setUser(currentUser);
-      else void signInAnonymously(auth).catch((reason: unknown) => {
-        setError(reason instanceof Error ? reason.message : 'Não foi possível iniciar uma sessão de comentários.');
+      if (currentUser) {
+        setUser(currentUser);
+        setError('');
+      } else void ensureAnonymousUser().catch((reason: unknown) => {
+        setError(getFirebaseErrorMessage(reason, 'Não foi possível iniciar uma sessão de comentários.'));
         setLoading(false);
       });
     });
@@ -91,15 +120,16 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
   }, [chapterId, user]);
 
   const postComment = async () => {
-    if (!firestore || !user) return;
+    if (!firestore || !firebaseConfigured || !firebaseAuth) return;
     const cleanName = name.trim().slice(0, 40);
     const cleanBody = body.trim();
     if (!cleanName || !cleanBody) return;
     setSending(true);
     setError('');
     try {
+      const author = user ?? await ensureAnonymousUser();
       await addDoc(collection(firestore, 'chapters', chapterId, 'comments'), {
-        authorUid: user.uid,
+        authorUid: author.uid,
         chapterId,
         authorName: cleanName,
         body: cleanBody,
@@ -148,7 +178,7 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
             <div className="flex items-end gap-2">
               <label className="sr-only" htmlFor={`comment-body-${chapterId}`}>Seu comentário</label>
               <textarea id={`comment-body-${chapterId}`} value={body} onChange={(event) => setBody(event.target.value.slice(0, 2000))} maxLength={2000} rows={3} className={`min-h-20 flex-1 resize-y rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu comentário" />
-              <button type="button" onClick={() => void postComment()} disabled={sending || !name.trim() || !body.trim() || !user || !firebaseConfigured} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-burgundy-700 text-white transition hover:bg-burgundy-800 disabled:cursor-not-allowed disabled:opacity-50" aria-label="Publicar comentário">{sending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</button>
+              <button type="button" onClick={() => void postComment()} disabled={sending || !name.trim() || !body.trim() || !firebaseAuth || !firebaseConfigured} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-burgundy-700 text-white transition hover:bg-burgundy-800 disabled:cursor-not-allowed disabled:opacity-50" aria-label="Publicar comentário">{sending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</button>
             </div>
             {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
           </div>
