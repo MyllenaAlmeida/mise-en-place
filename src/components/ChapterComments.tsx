@@ -120,10 +120,16 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
   }, [chapterId, user]);
 
   const postComment = async () => {
-    if (!firestore || !firebaseConfigured || !firebaseAuth) return;
+    if (!firestore || !firebaseConfigured || !firebaseAuth) {
+      setError('Comentários não estão conectados ao Firebase neste site.');
+      return;
+    }
     const cleanName = name.trim().slice(0, 40);
     const cleanBody = body.trim();
-    if (!cleanName || !cleanBody) return;
+    if (!cleanName || !cleanBody) {
+      setError('Preencha seu nome e comentário antes de enviar.');
+      return;
+    }
     setSending(true);
     setError('');
     try {
@@ -174,11 +180,11 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
         <>
           <div role="form" aria-label="Publicar comentário" className="shrink-0 space-y-2 border-b border-current/10 p-4 sm:space-y-3 sm:p-5">
             <label className="sr-only" htmlFor={`comment-author-name-${chapterId}`}>Seu nome</label>
-            <input id={`comment-author-name-${chapterId}`} value={name} onChange={(event) => setName(event.target.value.slice(0, 40))} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); void postComment(); } }} maxLength={40} required className={`h-10 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu nome" />
+            <input id={`comment-author-name-${chapterId}`} value={name} onInput={(event) => setName(event.currentTarget.value.slice(0, 40))} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); void postComment(); } }} maxLength={40} autoComplete="name" required className={`h-10 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu nome" />
             <div className="flex items-end gap-2">
               <label className="sr-only" htmlFor={`comment-body-${chapterId}`}>Seu comentário</label>
-              <textarea id={`comment-body-${chapterId}`} value={body} onChange={(event) => setBody(event.target.value.slice(0, 2000))} maxLength={2000} rows={3} className={`min-h-20 flex-1 resize-y rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu comentário" />
-              <button type="button" onClick={() => void postComment()} disabled={sending || !name.trim() || !body.trim() || !firebaseAuth || !firebaseConfigured} className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-burgundy-700 text-white transition hover:bg-burgundy-800 disabled:cursor-not-allowed disabled:opacity-50" aria-label="Publicar comentário">{sending ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</button>
+              <textarea id={`comment-body-${chapterId}`} value={body} onInput={(event) => setBody(event.currentTarget.value.slice(0, 2000))} maxLength={2000} rows={3} className={`min-h-20 flex-1 resize-y rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu comentário" />
+              <button type="button" onClick={() => void postComment()} disabled={sending} className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-burgundy-700 px-4 text-sm font-semibold text-white transition hover:bg-burgundy-800 disabled:cursor-wait disabled:opacity-60" aria-label="Publicar comentário">{sending ? <><LoaderCircle className="h-4 w-4 animate-spin" />Enviando</> : <><Send className="h-4 w-4" />Enviar</>}</button>
             </div>
             {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
           </div>
