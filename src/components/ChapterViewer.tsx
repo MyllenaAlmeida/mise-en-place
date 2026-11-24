@@ -1,18 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowUp, BookOpen, ChevronLeft, ChevronRight, Clock3, CookingPot, MessageCircle, X } from 'lucide-react';
-import { createPortal } from 'react-dom';
+import { ArrowUp, Clock3, CookingPot, MessageCircle } from 'lucide-react';
 import type { ReaderSettings } from '../types';
 import ChapterComments from './ChapterComments';
 
 interface ChapterViewerProps {
   chapterId: string;
   chapterUrl: string;
-  showNavigation: boolean;
   sidebarVisible: boolean;
   chapterIndex: number;
-  chapterCount: number;
-  previousChapterTitle?: string;
-  nextChapterTitle?: string;
   settings: ReaderSettings;
   onFontSizeChange: (fontSize: number) => void;
   onChapterRead: () => void;
@@ -22,29 +17,23 @@ interface ChapterViewerProps {
   hasPrev: boolean;
 }
 
-export default function ChapterViewer({ 
+export default function ChapterViewer({
   chapterId,
-  chapterUrl, 
-  showNavigation,
+  chapterUrl,
   sidebarVisible,
   chapterIndex,
-  chapterCount,
-  previousChapterTitle,
-  nextChapterTitle,
-  settings, 
+  settings,
   onFontSizeChange,
   onChapterRead,
-  onNext, 
-  onPrev, 
-  hasNext, 
-  hasPrev 
+  onNext,
+  onPrev,
+  hasNext,
+  hasPrev
 }: ChapterViewerProps) {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [floatingNavigationOpen, setFloatingNavigationOpen] = useState(false);
-  const [hasReachedChapterEnd, setHasReachedChapterEnd] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [commentsMount, setCommentsMount] = useState<HTMLElement | null>(null);
+  const commentsRef = useRef<HTMLElement>(null);
   const onChapterReadRef = useRef(onChapterRead);
   onChapterReadRef.current = onChapterRead;
   const readingMinutes = useMemo(() => {
@@ -83,13 +72,15 @@ export default function ChapterViewer({
 
   useEffect(() => {
     let cleanupReadTracking: (() => void) | undefined;
+    let resizeObserver: ResizeObserver | undefined;
     if (iframeRef.current && content) {
       const iframe = iframeRef.current;
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      
+
       if (doc) {
-        const previousScrollY = iframe.contentWindow?.scrollY ?? 0;
-        setCommentsMount(null);
+        const previousScrollY = window.scrollY;
+        iframe.style.height = '1px';
+        iframe.style.backgroundColor = settings.theme === 'dark' ? '#211719' : settings.theme === 'sepia' ? '#fffbeb' : '#faf8f2';
         doc.open();
         doc.write(content);
         doc.close();
@@ -136,7 +127,7 @@ export default function ChapterViewer({
         const style = doc.createElement('style');
         style.textContent = `
           @import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
-          
+
           * {
             box-sizing: border-box;
           }
@@ -144,7 +135,7 @@ export default function ChapterViewer({
           html {
             scroll-behavior: smooth;
           }
-          
+
           body {
             font-family: 'Lora', Georgia, serif !important;
             font-size: ${settings.fontSize}px !important;
@@ -170,7 +161,7 @@ export default function ChapterViewer({
               line-height: 1.75 !important;
             }
           }
-          
+
           h1, h2, h3 {
             font-family: 'Playfair Display', Georgia, serif !important;
             color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
@@ -181,7 +172,7 @@ export default function ChapterViewer({
           .chapter-title + #chapters .heading {
             display: none !important;
           }
-          
+
           p {
             margin-bottom: 1.5em !important;
             text-align: justify !important;
@@ -189,7 +180,7 @@ export default function ChapterViewer({
             font-weight: 400 !important;
             line-height: 1.75 !important;
           }
-          
+
           p:first-of-type {
             text-indent: 0 !important;
           }
@@ -252,7 +243,7 @@ export default function ChapterViewer({
             background: ${settings.theme === 'dark' ? '#3b493f' : '#e4eee3'} !important;
             color: ${settings.theme === 'dark' ? '#f0e5d3' : '#334536'} !important;
           }
-          
+
           .chapter-title {
             text-align: center !important;
             font-size: 2.5rem !important;
@@ -279,11 +270,11 @@ export default function ChapterViewer({
               line-height: 1.75 !important;
             }
           }
-          
+
           .calibre7, .userstuff1, .userstuff2, .calibre1 {
             font-family: 'Lora', Georgia, serif !important;
           }
-          
+
           .heading {
             font-family: 'Playfair Display', Georgia, serif !important;
             color: ${settings.theme === 'dark' ? '#e5c27b' : '#8c2727'} !important;
@@ -307,15 +298,6 @@ export default function ChapterViewer({
 
           [id^="endnotes"] {
             background: ${settings.theme === 'dark' ? '#332126' : settings.theme === 'sepia' ? '#f3eadb' : '#fbf8f2'} !important;
-          }
-
-          #chapter-comments-mount {
-            max-width: ${sidebarVisible ? 830 : 1040}px;
-            margin: 0 auto;
-            padding: 0 20px 48px;
-            color: ${settings.theme === 'dark' ? '#f0e5d3' : settings.theme === 'sepia' ? '#78350f' : '#45372a'};
-            font-family: Inter, Arial, sans-serif;
-            text-align: left;
           }
 
           .chapter-summary-section > p:first-child,
@@ -354,42 +336,45 @@ export default function ChapterViewer({
         chapterTop.style.height = '0';
         doc.body.prepend(chapterTop);
 
-        const chapterTextEnd = doc.body.scrollHeight;
-        const commentsContainer = doc.createElement('div');
-        commentsContainer.id = 'chapter-comments-mount';
-        doc.body.appendChild(commentsContainer);
-        setCommentsMount(commentsContainer);
-
+        const syncFrameHeight = () => {
+          iframe.style.height = `${Math.ceil(doc.body.scrollHeight)}px`;
+        };
+        syncFrameHeight();
+        if (typeof ResizeObserver !== 'undefined') {
+          resizeObserver = new ResizeObserver(syncFrameHeight);
+          resizeObserver.observe(doc.documentElement);
+          resizeObserver.observe(doc.body);
+        }
+        doc.querySelectorAll('img').forEach((image) => image.addEventListener('load', syncFrameHeight, { once: true }));
         const readingWindow = doc.defaultView;
         if (readingWindow) {
-          readingWindow.requestAnimationFrame(() => readingWindow.scrollTo(0, previousScrollY));
           let markedAsRead = false;
-          let checkFrame = 0;
           const markWhenAtEnd = () => {
             if (markedAsRead) return;
-            if (readingWindow.scrollY + readingWindow.innerHeight >= chapterTextEnd - 96) {
-              setHasReachedChapterEnd(true);
+            const frameBottom = iframe.getBoundingClientRect().bottom;
+            if (frameBottom <= window.innerHeight + 96) {
               markedAsRead = true;
               onChapterReadRef.current();
             }
           };
-          readingWindow.addEventListener('scroll', markWhenAtEnd, { passive: true });
-          checkFrame = readingWindow.requestAnimationFrame(markWhenAtEnd);
+          readingWindow.requestAnimationFrame(() => window.scrollTo(0, previousScrollY));
+          window.addEventListener('scroll', markWhenAtEnd, { passive: true });
+          window.addEventListener('resize', syncFrameHeight);
+          const checkFrame = requestAnimationFrame(markWhenAtEnd);
           cleanupReadTracking = () => {
-            readingWindow.removeEventListener('scroll', markWhenAtEnd);
-            readingWindow.cancelAnimationFrame(checkFrame);
+            window.removeEventListener('scroll', markWhenAtEnd);
+            window.removeEventListener('resize', syncFrameHeight);
+            cancelAnimationFrame(checkFrame);
           };
         }
 
       }
     }
-    return () => cleanupReadTracking?.();
+    return () => {
+      cleanupReadTracking?.();
+      resizeObserver?.disconnect();
+    };
   }, [content, settings, chapterId]);
-
-  useEffect(() => {
-    setFloatingNavigationOpen(false);
-    setHasReachedChapterEnd(false);
-  }, [chapterUrl, showNavigation]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const target = e.target as HTMLElement | null;
@@ -405,22 +390,22 @@ export default function ChapterViewer({
   };
 
   return (
-    <div className={`flex h-full flex-col ${settings.theme === 'dark' ? 'bg-[#211719]' : settings.theme === 'sepia' ? 'bg-amber-100' : 'bg-ivory-50'}`} onKeyDown={handleKeyDown} tabIndex={0}>
+    <div className={`flex min-h-full flex-col ${settings.theme === 'dark' ? 'bg-[#211719]' : settings.theme === 'sepia' ? 'bg-amber-100' : 'bg-ivory-50'}`} onKeyDown={handleKeyDown} tabIndex={0}>
       {/* Chapter Content */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <div className="flex flex-col">
         <div className={`sticky top-0 z-10 grid grid-cols-1 items-center gap-2 border-b px-3 py-2 text-[0.68rem] font-medium shadow-sm backdrop-blur sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:px-5 sm:text-xs ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]/95 text-[#e0cfd1]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50/95 text-amber-900/80' : 'border-ivory-300 bg-ivory-50/95 text-charcoal-600'}`} aria-label="Controles e informações do capítulo">
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-center sm:col-start-2" role="status" aria-label={`Leitura estimada: ${readingMinutes} minutos; tempo de cocção estimado: ${readingMinutes} minutos`}>
             <span className="inline-flex items-center gap-1.5"><Clock3 className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Leitura: ~{readingMinutes} min</span>
             <span className="inline-flex items-center gap-1.5"><CookingPot className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />Tempo de cocção: ~{readingMinutes} min</span>
           </div>
-          <button type="button" onClick={() => iframeRef.current?.contentWindow?.document.getElementById('chapter-comments-mount')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="col-span-full inline-flex items-center justify-center gap-1.5 text-[0.65rem] opacity-70 transition hover:opacity-100 sm:col-start-1 sm:col-span-1 sm:row-start-1 sm:justify-start sm:text-[0.68rem]" aria-label="Ir para os comentários no final do capítulo"><MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /><span>Ir para os comentários</span></button>
+          <button type="button" onClick={() => commentsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="col-span-full inline-flex items-center justify-center gap-1.5 text-[0.65rem] opacity-70 transition hover:opacity-100 sm:col-start-1 sm:col-span-1 sm:row-start-1 sm:justify-start sm:text-[0.68rem]" aria-label="Ir para os comentários no final do capítulo"><MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /><span>Ir para os comentários</span></button>
           <div className="ml-auto inline-flex shrink-0 items-center gap-1 sm:col-start-3 sm:row-start-1" role="group" aria-label="Tamanho do texto">
             <button type="button" onClick={() => onFontSizeChange(Math.max(12, settings.fontSize - 1))} disabled={settings.fontSize <= 12} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Diminuir tamanho da fonte" title="Diminuir fonte">A−</button>
             <button type="button" onClick={() => onFontSizeChange(Math.min(24, settings.fontSize + 1))} disabled={settings.fontSize >= 24} className="flex h-8 min-w-9 items-center justify-center rounded-lg border border-current/20 px-2 text-sm font-semibold transition hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40" aria-label="Aumentar tamanho da fonte" title="Aumentar fonte">A+</button>
           </div>
         </div>
         {isLoading ? (
-            <div className="flex min-h-0 flex-1 flex-col items-center justify-center animate-fade-in">
+            <div className="flex min-h-[60vh] flex-col items-center justify-center animate-fade-in">
             <div className="text-3xl sm:text-4xl mb-4 animate-bounce">📖</div>
             <div className={`text-base font-serif italic sm:text-lg ${settings.theme === 'dark' ? 'text-gold-300' : 'text-burgundy-600'}`}>Carregando capítulo...</div>
           </div>
@@ -428,94 +413,21 @@ export default function ChapterViewer({
           <iframe
             ref={iframeRef}
             title="Chapter Content"
-            className="w-full min-h-0 flex-1 border-0"
+            className="block w-full border-0"
+            style={{ height: 'calc(100dvh - 140px)' }}
             sandbox="allow-same-origin"
           />
         )}
       </div>
-      
-      {/* Navigation Controls */}
-      {showNavigation && <div className={`${hasReachedChapterEnd ? 'flex' : 'hidden sm:flex'} items-center gap-2 border-t px-3 py-2 shadow-soft sm:gap-3 sm:px-6 sm:py-2.5 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#2a1b1f]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50' : 'border-ivory-300 bg-ivory-50'}`}>
-        <button
-          onClick={onPrev}
-          disabled={!hasPrev}
-          className={`group flex min-h-10 min-w-0 flex-1 items-center gap-1.5 rounded-lg border px-2.5 py-1.5 transition-colors disabled:cursor-not-allowed sm:min-h-12 sm:gap-2.5 sm:px-4 sm:py-2 ${settings.theme === 'dark' ? 'border-[#68434a] bg-[#332126] text-[#f0e5d3] hover:bg-[#41252b] disabled:bg-[#332126] disabled:text-[#a89985]' : settings.theme === 'sepia' ? 'border-amber-300 bg-amber-50 text-burgundy-800 hover:bg-amber-100 disabled:bg-amber-100 disabled:text-amber-700/50' : 'border-ivory-300 bg-white text-burgundy-800 hover:border-burgundy-300 hover:bg-ivory-100 disabled:bg-ivory-100 disabled:text-charcoal-400'}`}
-          aria-label={previousChapterTitle ? `Capítulo anterior: ${previousChapterTitle}` : 'Capítulo anterior'}
-        >
-          <svg className="h-4 w-4 shrink-0 transition-transform group-hover:-translate-x-0.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          <span className="flex min-w-0 flex-col items-start text-left">
-            <span className="text-[0.82rem] font-semibold sm:text-sm">Anterior</span>
-            {previousChapterTitle && <span className={`hidden max-w-40 truncate text-xs font-normal sm:block ${settings.theme === 'dark' ? 'text-ivory-400' : 'text-charcoal-500'}`}>{previousChapterTitle}</span>}
-          </span>
-        </button>
 
-        <div className={`shrink-0 px-1 text-center ${settings.theme === 'dark' ? 'text-ivory-300' : settings.theme === 'sepia' ? 'text-amber-900/70' : 'text-charcoal-600'}`} aria-label={`Capítulo ${chapterIndex + 1} de ${chapterCount}`}>
-          <span className="block whitespace-nowrap text-[0.62rem] font-semibold uppercase tracking-wide sm:text-[0.68rem]">Capítulo {chapterIndex + 1} de {chapterCount}</span>
+      <section ref={commentsRef} className="scroll-mt-16 border-t border-current/10 px-3 py-6 sm:px-6" aria-label="Comentários do capítulo">
+        <div className="mx-auto mb-6 flex w-full max-w-3xl justify-center">
+          <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</button>
         </div>
+        <ChapterComments chapterId={chapterId} chapterNumber={chapterIndex + 1} theme={settings.theme} layout="section" />
+      </section>
 
-        <button
-          onClick={onNext}
-          disabled={!hasNext}
-          className="group flex min-h-10 min-w-0 flex-1 items-center justify-end gap-1.5 rounded-lg border border-burgundy-700 bg-burgundy-700 px-2.5 py-1.5 text-ivory-50 transition-colors hover:bg-burgundy-800 disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-12 sm:gap-2.5 sm:px-4 sm:py-2"
-          aria-label={nextChapterTitle ? `Próximo capítulo: ${nextChapterTitle}` : 'Próximo capítulo'}
-        >
-          <span className="flex min-w-0 flex-col items-end text-right">
-            <span className="text-[0.82rem] font-semibold sm:text-sm">Próximo</span>
-            {nextChapterTitle && <span className="hidden max-w-40 truncate text-xs font-normal text-ivory-100/80 sm:block">{nextChapterTitle}</span>}
-          </span>
-          <svg className="h-4 w-4 shrink-0 transition-transform group-hover:translate-x-0.5 sm:h-5 sm:w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
-      </div>}
-      {!showNavigation && (
-        <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
-          {floatingNavigationOpen && (
-            <section id="floating-chapter-navigation" className="w-[min(20rem,calc(100vw-2rem))] rounded-2xl border border-ivory-300 bg-ivory-50 p-4 shadow-elegant" aria-label="Navegação entre capítulos">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-wider text-charcoal-500">Navegar capítulos</p>
-                  <p className="mt-1 text-sm font-semibold text-burgundy-800">Capítulo {chapterIndex + 1} de {chapterCount}</p>
-                </div>
-                <button onClick={() => setFloatingNavigationOpen(false)} className="flex h-9 w-9 items-center justify-center rounded-lg text-charcoal-600 transition hover:bg-ivory-200" aria-label="Fechar navegação">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <button onClick={onPrev} disabled={!hasPrev} className="flex min-h-12 min-w-0 items-center gap-2 rounded-xl border border-ivory-300 bg-white px-3 py-2 text-left text-xs font-semibold text-burgundy-800 transition hover:border-burgundy-300 hover:bg-ivory-100 disabled:cursor-not-allowed disabled:opacity-45" aria-label={previousChapterTitle ? `Capítulo anterior: ${previousChapterTitle}` : 'Capítulo anterior'}>
-                  <ChevronLeft className="h-4 w-4 shrink-0" />
-                  <span className="min-w-0"><span className="block">Anterior</span>{previousChapterTitle && <span className="mt-0.5 block truncate font-normal text-charcoal-500">{previousChapterTitle}</span>}</span>
-                </button>
-                <button onClick={onNext} disabled={!hasNext} className="flex min-h-12 min-w-0 items-center justify-end gap-2 rounded-xl border border-burgundy-700 bg-burgundy-700 px-3 py-2 text-right text-xs font-semibold text-ivory-50 transition hover:bg-burgundy-800 disabled:cursor-not-allowed disabled:opacity-45" aria-label={nextChapterTitle ? `Próximo capítulo: ${nextChapterTitle}` : 'Próximo capítulo'}>
-                  <span className="min-w-0"><span className="block">Próximo</span>{nextChapterTitle && <span className="mt-0.5 block truncate font-normal text-ivory-100/80">{nextChapterTitle}</span>}</span>
-                  <ChevronRight className="h-4 w-4 shrink-0" />
-                </button>
-              </div>
-            </section>
-          )}
-          <button
-            onClick={() => setFloatingNavigationOpen((open) => !open)}
-            className="inline-flex min-h-12 items-center gap-2 rounded-full border border-burgundy-800 bg-burgundy-700 px-4 text-sm font-semibold text-ivory-50 shadow-elegant transition hover:-translate-y-0.5 hover:bg-burgundy-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-burgundy-600"
-            aria-expanded={floatingNavigationOpen}
-            aria-controls="floating-chapter-navigation"
-            aria-label={floatingNavigationOpen ? 'Fechar navegação de capítulos' : 'Abrir navegação de capítulos'}
-          >
-            <BookOpen className="h-4 w-4" />
-            <span>Capítulo {chapterIndex + 1}/{chapterCount}</span>
-          </button>
-        </div>
-      )}
-      {commentsMount && createPortal(
-        <>
-          <div className="mx-auto mb-10 flex w-full max-w-3xl justify-center px-4 sm:px-5">
-            <a href="#chapter-top" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-current/15 px-4 text-sm font-semibold opacity-75 transition hover:bg-current/5 hover:opacity-100" aria-label="Voltar ao topo do capítulo"><ArrowUp className="h-4 w-4" />Voltar ao topo</a>
-          </div>
-          <ChapterComments chapterId={chapterId} chapterNumber={chapterIndex + 1} theme={settings.theme} layout="section" />
-        </>,
-        commentsMount,
-      )}
+
     </div>
   );
 }

@@ -315,20 +315,16 @@ function App() {
       </div>
 
       {/* Main Content */}
-      <div className="flex h-[calc(100dvh-70px)] min-h-0 sm:h-[calc(100dvh-86px)]">
+      <div className="flex min-h-[calc(100dvh-70px)] sm:min-h-[calc(100dvh-86px)]">
         {renderSidebar('reader')}
         
-        <main className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <main id="reader-scroll-container" className="flex min-w-0 flex-1 flex-col">
           {currentChapter && (
             <ChapterViewer
               chapterId={currentChapter.id}
               chapterUrl={currentChapter.href}
-              showNavigation={readerSidebarVisible}
               sidebarVisible={readerSidebarVisible}
               chapterIndex={currentChapterIndex}
-              chapterCount={chapters.length}
-              previousChapterTitle={chapters[currentChapterIndex - 1]?.label}
-              nextChapterTitle={chapters[currentChapterIndex + 1]?.label}
               settings={settings}
               onFontSizeChange={(fontSize) => setSettings((current) => ({ ...current, fontSize }))}
               onChapterRead={() => markChapterAsRead(currentChapter.id)}

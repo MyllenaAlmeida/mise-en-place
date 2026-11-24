@@ -75,7 +75,7 @@ export default function Sidebar({ chapters, currentChapter, readChapterIds, acti
       </>}
 
       {desktopVisible ? (
-        <aside className={`hidden h-full w-72 shrink-0 flex-col overflow-hidden shadow-elegant sm:flex ${surface}`}>
+        <aside className={`sticky top-20 hidden h-[calc(100dvh-5rem)] w-72 shrink-0 self-start flex-col overflow-hidden shadow-elegant sm:flex ${surface}`}>
           <div className="flex items-center justify-between border-b border-ivory-300 bg-gradient-to-r from-burgundy-600 to-burgundy-700 p-4 sm:p-5">
             <div>
               <h2 className="font-display text-xl font-semibold tracking-wide text-ivory-50">Capítulos</h2>

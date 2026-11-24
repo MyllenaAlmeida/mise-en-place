@@ -178,16 +178,16 @@ export default function ChapterComments({ chapterId, chapterNumber, theme, layou
         <div className="p-5 text-sm">Comentários ainda não estão configurados. Adicione as credenciais do Firebase seguindo <code>docs/FIREBASE_COMMENTS_SETUP.md</code>.</div>
       ) : (
         <>
-          <div role="form" aria-label="Publicar comentário" className="shrink-0 space-y-2 border-b border-current/10 p-4 sm:space-y-3 sm:p-5">
+          <form aria-label="Publicar comentário" className="shrink-0 space-y-2 border-b border-current/10 p-4 sm:space-y-3 sm:p-5" onSubmit={(event) => { event.preventDefault(); void postComment(); }}>
             <label className="sr-only" htmlFor={`comment-author-name-${chapterId}`}>Seu nome</label>
-            <input id={`comment-author-name-${chapterId}`} value={name} onInput={(event) => setName(event.currentTarget.value.slice(0, 40))} onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); void postComment(); } }} maxLength={40} autoComplete="name" required className={`h-10 w-full rounded-lg border px-3 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu nome" />
-            <div className="flex items-end gap-2">
+            <input id={`comment-author-name-${chapterId}`} value={name} onChange={(event) => setName(event.currentTarget.value.slice(0, 40))} maxLength={40} autoComplete="name" required className={`h-11 w-full rounded-lg border px-3 text-base outline-none focus:ring-2 focus:ring-burgundy-500/40 sm:text-sm ${field}`} placeholder="Seu nome" />
+            <div className="flex min-w-0 flex-col items-stretch gap-2 sm:flex-row sm:items-end">
               <label className="sr-only" htmlFor={`comment-body-${chapterId}`}>Seu comentário</label>
-              <textarea id={`comment-body-${chapterId}`} value={body} onInput={(event) => setBody(event.currentTarget.value.slice(0, 2000))} maxLength={2000} rows={3} className={`min-h-20 flex-1 resize-y rounded-xl border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-burgundy-500/40 ${field}`} placeholder="Seu comentário" />
-              <button type="button" onClick={() => void postComment()} disabled={sending} className="inline-flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-burgundy-700 px-4 text-sm font-semibold text-white transition hover:bg-burgundy-800 disabled:cursor-wait disabled:opacity-60" aria-label="Publicar comentário">{sending ? <><LoaderCircle className="h-4 w-4 animate-spin" />Enviando</> : <><Send className="h-4 w-4" />Enviar</>}</button>
+              <textarea id={`comment-body-${chapterId}`} value={body} onChange={(event) => setBody(event.currentTarget.value.slice(0, 2000))} maxLength={2000} rows={3} className={`min-h-24 min-w-0 w-full flex-1 resize-y rounded-xl border px-3 py-2 text-base outline-none focus:ring-2 focus:ring-burgundy-500/40 sm:text-sm ${field}`} placeholder="Seu comentário" />
+              <button type="submit" disabled={sending} className="inline-flex h-11 w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-burgundy-700 px-4 text-sm font-semibold text-white transition hover:bg-burgundy-800 disabled:cursor-wait disabled:opacity-60 sm:w-auto" aria-label="Publicar comentário">{sending ? <><LoaderCircle className="h-4 w-4 animate-spin" />Enviando</> : <><Send className="h-4 w-4" />Enviar</>}</button>
             </div>
             {error && <p role="alert" className="text-xs text-red-600">{error}</p>}
-          </div>
+          </form>
           <div className="flex items-center gap-3 border-b border-current/10 px-4 py-3 sm:px-5">
             <h3 className="font-serif text-lg font-semibold">Comentários deste capítulo <span className="text-sm font-normal opacity-60">({comments.length})</span></h3>
           </div>
