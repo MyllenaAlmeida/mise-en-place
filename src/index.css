@@ -228,80 +228,6 @@ body {
 }
 
 /* Custom animations */
-.violeta-aged-paper {
-  background-color: #f5e9ce !important;
-  background-image:
-    radial-gradient(ellipse at 16% 8%, rgb(255 252 237 / 72%), transparent 45%),
-    radial-gradient(ellipse at 88% 92%, rgb(184 146 91 / 11%), transparent 40%),
-    linear-gradient(135deg, #fbf3df 0%, #f3e5c8 54%, #f8edda 100%) !important;
-}
-
-.violeta-handwriting {
-  font-family: 'Caveat', 'Comic Sans MS', cursive;
-  letter-spacing: 0.01em;
-}
-
-.violeta-ink {
-  color: #51402e;
-}
-
-:root[data-theme='dark'] .violeta-ink {
-  color: #eadcc7;
-}
-
-.violeta-scribble {
-  font-family: 'Caveat', 'Comic Sans MS', cursive;
-  color: #8d302f;
-  transform: rotate(-2deg);
-}
-
-@keyframes violetaPageTurn {
-  from { transform: rotateY(0deg); box-shadow: inset 0 0 0 rgb(75 51 30 / 0%); }
-  45% { box-shadow: inset -18px 0 20px rgb(75 51 30 / 18%); }
-  to { transform: rotateY(-180deg); box-shadow: inset -2px 0 4px rgb(75 51 30 / 5%); }
-}
-
-@keyframes violetaPageTurnBack {
-  from { transform: rotateY(0deg); box-shadow: inset 0 0 0 rgb(75 51 30 / 0%); }
-  45% { box-shadow: inset 18px 0 20px rgb(75 51 30 / 18%); }
-  to { transform: rotateY(180deg); box-shadow: inset 2px 0 4px rgb(75 51 30 / 5%); }
-}
-
-.violeta-page-surface {
-  perspective: 1200px;
-}
-
-.violeta-open-spread {
-  animation: violetaBookOpen 620ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
-  transform-origin: top center;
-}
-
-@keyframes violetaBookOpen {
-  from { opacity: 0; transform: perspective(900px) rotateX(7deg) scale(0.97); }
-  to { opacity: 1; transform: perspective(900px) rotateX(0) scale(1); }
-}
-
-.violeta-page-flip {
-  position: absolute;
-  z-index: 10;
-  inset: 0;
-  transform-origin: left center;
-  backface-visibility: hidden;
-  animation: violetaPageTurn 520ms cubic-bezier(0.35, 0.02, 0.55, 1) both;
-}
-
-@media (min-width: 640px) {
-  .violeta-page-flip {
-    inset-inline-start: 50%;
-    width: 50%;
-  }
-}
-
-.violeta-page-flip-back {
-  transform-origin: right center;
-  animation-name: violetaPageTurnBack;
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -489,14 +415,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .violeta-page-flip {
-    animation-duration: 1ms;
-  }
-
-  .violeta-open-spread {
-    animation-duration: 1ms;
-  }
-
   .cut-flash,
   .cut-ingredient-shake,
   .cut-piece-split,
